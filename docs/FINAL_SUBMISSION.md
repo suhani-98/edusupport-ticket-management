@@ -13,7 +13,7 @@ Students, staff, and managers each have a signed-in workspace. The server enforc
 
 The client is React. The API is Express on MongoDB. Hiding a control in the interface is not the permission check.
 
-The server test suite contains 39 passing tests. The server build, server lint, seed, client build, and client lint also passed. Browser and end-to-end testing was not performed. Playwright and Vitest are not configured.
+The server test suite contains 39 passing tests. The server build, server lint, seed, client build, and client lint also passed. A live manual browser smoke test then passed for the student, staff, and manager flows. Playwright and Vitest are not configured. One resolution-dialog validation issue found during that smoke test was fixed afterward. The corrected dialog was not rerun in the browser.
 
 ## 2. Problem Understanding
 
@@ -375,7 +375,28 @@ Checked on 25 September 2026:
 
 The server test suite contains 39 passing tests. It covers authentication, the ticket domain, ticket APIs, workflow, lifecycle, SLA and escalation, dashboards, the category list, and the staff directory.
 
-Browser and end-to-end testing was not performed. Playwright and Vitest are not configured. Client build and lint are the frontend checks that were run.
+A live manual browser smoke test was completed after that automated validation. The backend and frontend started successfully. These checks passed:
+
+- Student flow
+- Manager flow
+- Staff flow
+- Ticket creation
+- Assignment
+- Public comments
+- Internal-note behavior, including that a student does not see an internal note
+- Status lifecycle
+- SLA refresh
+- Escalation
+- Resolution
+- Close and reopen
+- Role isolation
+- Unauthorized ticket access, which returned 404
+
+No persistent browser console errors occurred. Playwright and Vitest are not configured. The live browser smoke test was manual.
+
+During that smoke test, a browser validation issue occurred when a closed resolution dialog containing a required field was submitted. The issue was identified and fixed in `client/src/components/staff/ResolveTicketDialog.tsx`. The fix disables native validation while the dialog is closed, keeps the resolution field required when the dialog is open, and leaves server-side validation unchanged.
+
+A browser validation issue was identified during live smoke testing and fixed by disabling native validation while the resolution dialog is closed. The original resolution flow had otherwise completed successfully. The corrected dialog was not rerun after the fix, because the smoke-test ticket was no longer available and the application has no supported ticket-delete operation. The corrected dialog was not browser-verified after the fix.
 
 ## 20. Security and Data-Safety Considerations
 
@@ -407,8 +428,8 @@ Login rate limiting is not implemented. The access token remains in `localStorag
 - Managers cannot create tickets, and an assignee cannot be cleared.
 - Ticket and activity writes are not transactional.
 - The access token is stored in `localStorage`.
-- Browser click-through was not performed.
-- Playwright and Vitest are not configured.
+- Playwright and Vitest are not configured. The live browser check was a manual smoke test, not an automated end-to-end suite.
+- The resolution-dialog fix was not rerun in the browser after the change.
 
 ## 22. Future Improvements
 
@@ -432,7 +453,7 @@ AI tool: Cursor with Grok.
 
 AI was used for planning, architecture discussion, implementation assistance, test generation and review, documentation, and UI development. Outputs were reviewed against the assignment and the running application. Incorrect assumptions were corrected during implementation, including an early business-hours clock and automatic reassignment on breach. The implemented SLA is wall-clock time, pending does not pause it, and escalation is manual.
 
-Final validation was the server test suite, server and client builds, linting, seed validation, and a source-level review of security and authorization. Browser validation was not performed.
+Final validation was the server test suite, server and client builds, linting, seed validation, a source-level review of security and authorization, and a live manual browser smoke test. During that smoke test, a closed resolution dialog triggered native validation on a required field. The form now skips native validation while the dialog is closed. The resolution field stays required when the dialog is open, and server-side validation is unchanged. The corrected dialog was not rerun in the browser after the fix.
 
 The dated log is in `docs/AI_USAGE_REPORT.md`.
 
@@ -474,4 +495,4 @@ Further notes: `docs/API.md`, `docs/VALIDATION.md`, and `docs/AI_USAGE_REPORT.md
 
 EduSupport is a three-role help desk with a server-enforced status machine, a separate SLA clock, and manual escalation. Students own their tickets. Staff work what is assigned to them. Managers see the organization and assign the work.
 
-The server test suite contains 39 passing tests. Server build, server lint, seed, client build, and client lint passed. Browser and end-to-end testing was not performed. Charts, notifications, real-time updates, automatic reassignment, background SLA monitoring, and category or SLA-policy administration are not part of this prototype.
+The server test suite contains 39 passing tests. Server build, server lint, seed, client build, and client lint passed. A live manual browser smoke test passed for the student, staff, and manager flows. Playwright and Vitest are not configured. The resolution-dialog fix found during that smoke test was not rerun in the browser. Charts, notifications, real-time updates, automatic reassignment, background SLA monitoring, and category or SLA-policy administration are not part of this prototype.
