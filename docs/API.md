@@ -11,7 +11,7 @@ Every private route passes through authentication, then role authorization, then
 Success:
 
 ```json
-{ "success": true, "message": "optional", "data": {} }
+{ "success": true, "data": {} }
 ```
 
 Error:
@@ -23,39 +23,52 @@ Error:
 | HTTP | When |
 |---|---|
 | 400 | Body fails schema validation |
-| 401 | Missing or invalid token |
+| 401 | Missing or invalid token, or a failed login |
 | 403 | Role or resource ownership refused |
-| 404 | Id does not exist |
-| 409 | Stale `version`, or duplicate-ticket warning |
+| 404 | Id does not exist, or the caller cannot see that ticket |
+| 409 | Email already registered, or an escalation conflict |
 | 422 | Valid body, illegal business operation |
 | 500 | Unexpected server failure |
 
-Mutations that change a ticket include `version` from the last read. A mismatch is `409` `VERSION_CONFLICT`. That field is part of this blueprint because concurrent updates were already a product rule.
+Tickets do not store a `version`. Optimistic concurrency and `409` `VERSION_CONFLICT` are not implemented. Duplicate-ticket detection is not implemented.
 
 ## Security
 
-Password hashing, JWT, role checks, input validation, rate limiting on `/auth/login` and `/auth/register`, secure HTTP headers, secrets only in environment variables, nothing secret committed, CORS limited to the frontend origin.
+Implemented: password hashing, JWT, role checks, input validation, secrets only in environment variables, nothing secret committed, and CORS limited to the frontend origin.
+
+Not implemented: rate limiting on `/auth/login` and `/auth/register`, security-header middleware, and optimistic concurrency. Those are future improvements.
 
 ## Auth
 
 | Method | Path | Who | Body | Success | Errors |
 |---|---|---|---|---|---|
-| POST | `/auth/register` | Public | `name`, `email`, `password` | `201`, `success`, message "Account created successfully" | 400 invalid body; 409 email already used |
-| POST | `/auth/login` | Public | `email`, `password` | `token` and `user` (`id`, `name`, `role`) | 401 bad credentials; 403 if `isActive` is false |
+| POST | `/auth/register` | Public | `name`, `email`, `password` | `201`, `{ success, data: { user } }` | 400 invalid body; 409 `EMAIL_TAKEN` |
+| POST | `/auth/login` | Public | `email`, `password` | `data.token` and `data.user` | 401 `INVALID_CREDENTIALS` for a wrong password, an unknown email, or an inactive account |
 
 Register creates a **student** only. Staff and manager accounts come from seed data. A public register that can set `role` is rejected.
 
-Login user example:
+An inactive account uses that same `401` and the message "Invalid email or password." It does not return `403`.
+
+Login response:
 
 ```json
 {
   "success": true,
-  "token": "...",
-  "user": { "id": "...", "name": "Suhani Gupta", "role": "student" }
+  "data": {
+    "token": "...",
+    "user": {
+      "id": "...",
+      "name": "Dev Student",
+      "email": "student@edusupport.local",
+      "role": "student",
+      "department": null,
+      "isActive": true
+    }
+  }
 }
 ```
 
-`GET /auth/me` is included so the client can restore a session from the token. It was not in the first map. It returns the same user object. `401` if the token is missing.
+`GET /auth/me` restores the session from the token. It returns the same public user inside `data`. A missing or invalid token is `401`. Each authenticated request reloads the user and uses the role stored in the database.
 
 ## Tickets
 
