@@ -89,3 +89,10 @@ Further AI use (implementation, tests, UI) will be appended below as the prototy
 - Asked for `POST /api/v1/tickets`, `GET /api/v1/tickets`, and `GET /api/v1/tickets/:id` only. Comments, activity history, dashboards, escalation, and ticket screens were left out.
 - Students create tickets. The server sets the owner, ticket number, category default priority, SLA policy, and deadline. A hidden ticket and a missing ticket both return 404.
 - 27 server tests passed (auth, domain, ticket API). A local create, list, and detail check against MongoDB also passed. The smoke ticket was deleted afterward. The counter kept that number, which is the intended gap if an insert is rolled back.
+
+### 24 September 2026 — assignment, status, priority, and activity history
+
+- Asked for assignment, status transitions, priority changes, and an activity trail. Comments, resolve/close endpoints, dashboards, notifications, and automatic escalation were left out.
+- Managers assign only to active staff. Reassignment does not change operational status. Priority recalculates the deadline from the original `createdAt` and does not raise `escalationLevel`.
+- Local MongoDB is standalone, so ticket and activity writes are sequential with a compensating update if the activity insert fails. They are not a transaction.
+- 30 server tests passed. A local assign, reassign, invalid transition, status change, priority change, and activity list also passed. The smoke ticket was deleted.

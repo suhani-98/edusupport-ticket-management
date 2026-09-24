@@ -151,3 +151,60 @@ export function validateTicketId(id: string): string {
   }
   return id;
 }
+
+function requireObject(body: unknown): Record<string, unknown> {
+  if (body === null || typeof body !== "object" || Array.isArray(body)) {
+    throw new AppError(400, "VALIDATION_ERROR", "Request body is required.");
+  }
+  return body as Record<string, unknown>;
+}
+
+function rejectFields(record: Record<string, unknown>, fields: readonly string[]): void {
+  const forbidden = fields.filter((field) => record[field] !== undefined);
+  if (forbidden.length > 0) {
+    throw new AppError(400, "VALIDATION_ERROR", `These fields are set by the server: ${forbidden.join(", ")}.`);
+  }
+}
+
+const SERVER_OWNED_UPDATE_FIELDS = ["slaDeadline", "slaStatus", "slaPolicyId", "escalationLevel", "studentId", "ticketNumber"] as const;
+
+export function validateAssignmentBody(body: unknown): { assignedTo: string } {
+  const record = requireObject(body);
+  rejectFields(record, [...SERVER_OWNED_UPDATE_FIELDS, "status", "priority", "resolution"]);
+  if (typeof record.assignedTo !== "string" || !isObjectId(record.assignedTo)) {
+    throw new AppError(400, "VALIDATION_ERROR", "assignedTo must be a valid id.");
+  }
+  return { assignedTo: record.assignedTo };
+}
+
+export function validateStatusBody(body: unknown): { status: TicketStatus } {
+  const record = requireObject(body);
+  rejectFields(record, [...SERVER_OWNED_UPDATE_FIELDS, "assignedTo", "priority", "resolution", "resolvedAt", "closedAt"]);
+  if (typeof record.status !== "string" || !ticketStatuses.includes(record.status as TicketStatus)) {
+    throw new AppError(400, "VALIDATION_ERROR", "status is not valid.");
+  }
+  return { status: record.status as TicketStatus };
+}
+
+export function validatePriorityBody(body: unknown): { priority: TicketPriority } {
+  const record = requireObject(body);
+  rejectFields(record, [...SERVER_OWNED_UPDATE_FIELDS, "assignedTo", "status", "resolution"]);
+  if (typeof record.priority !== "string" || !ticketPriorities.includes(record.priority as TicketPriority)) {
+    throw new AppError(400, "VALIDATION_ERROR", "priority is not valid.");
+  }
+  return { priority: record.priority as TicketPriority };
+}
+
+export type ActivityListQuery = { page: number; limit: number };
+
+export function validateActivityListQuery(query: Record<string, unknown>): ActivityListQuery {
+  const page = query.page === undefined ? 1 : Number(query.page);
+  const limit = query.limit === undefined ? 20 : Number(query.limit);
+  if (!Number.isInteger(page) || page < 1) {
+    throw new AppError(400, "VALIDATION_ERROR", "page must be an integer of at least 1.");
+  }
+  if (!Number.isInteger(limit) || limit < 1 || limit > 100) {
+    throw new AppError(400, "VALIDATION_ERROR", "limit must be an integer from 1 to 100.");
+  }
+  return { page, limit };
+}

@@ -129,21 +129,19 @@ Detail includes description, category, priority, status, SLA, assignee, student 
 
 ## Assignment
 
-`PATCH /tickets/:ticketId/assignment`
+`PATCH /tickets/:id/assignment`
 
-Body: `assignedTo`, `version`.
+Manager only. Body: `{ "assignedTo": "staffUserId" }`.
 
-Manager, or staff accepting an `OPEN` ticket onto themselves. The service checks the target user exists, `isActive` is true, and the role is `staff` or `manager`. Then it updates `assignedTo`, writes activity `ASSIGNED` or a reassignment (`oldValue` previous name, `newValue` new name), and returns the ticket.
+The target must be an active user whose role is `staff`. A student target is `422` `INVALID_ASSIGNEE`. A manager target is the same code. Inactive staff is `422` `STAFF_INACTIVE`. Students and staff who call this route get `403`.
 
-Staff sending someone else's id: `403`. Inactive target: `422` `STAFF_INACTIVE`.
-
-Reassignment does not change `slaDeadline` or `escalationLevel`.
+An `OPEN` ticket becomes `ASSIGNED` and records `TICKET_ASSIGNED`. Reassignment changes `assignedTo` only. `IN_PROGRESS`, `PENDING`, and any other current status stay as they are, and the activity is `TICKET_REASSIGNED`. `oldValue` and `newValue` are user ids. SLA deadline, SLA status, and escalation level do not change. `RESOLVED` and `CLOSED` tickets return `422` `TICKET_NOT_ASSIGNABLE`.
 
 ## Status
 
-`PATCH /tickets/:ticketId/status`
+`PATCH /tickets/:id/status`
 
-Body: `status`, `version`, plus `message` when the target is `PENDING`.
+Body: `{ "status": "IN_PROGRESS" }`. Staff may change a ticket assigned to them. A manager may change any ticket. A student gets `403`. A staff member who cannot see the ticket gets `404` `TICKET_NOT_FOUND`.
 
 Allowed:
 
@@ -156,19 +154,25 @@ Allowed:
 | IN_PROGRESS | RESOLVED |
 | RESOLVED | CLOSED |
 
-`CLOSED → IN_PROGRESS` on this route is `422` `INVALID_TRANSITION`. Resolve and close still go through their own actions below, so this patch cannot set `RESOLVED` without a resolution note. If `status` is `RESOLVED` or `CLOSED`, respond `422` and point the client at `/resolve` or `/close`.
+Any other pair is `422` `INVALID_TRANSITION`. `OPEN → ASSIGNED` also requires an assignee already set; otherwise `422` `ASSIGNMENT_REQUIRED`. Use `/assignment` for the normal first assignment.
 
-`OPEN → ASSIGNED` still requires an assignee, so clients use `/assignment` for that pair. This route accepts it only when `assignedTo` is already set.
-
-`IN_PROGRESS → PENDING` requires `message`, stored as a `PUBLIC` comment.
+`IN_PROGRESS → RESOLVED` is rejected with `400` unless `resolution` is already stored. This step does not add a resolve or close endpoint, so that transition cannot be completed from the client yet. A later status of `CLOSED` sets `closedAt`. Each accepted change records `STATUS_CHANGED`. Pending does not require a comment in this step.
 
 ## Priority
 
-`PATCH /tickets/:ticketId/priority`
+`PATCH /tickets/:id/priority`
 
-Body: `priority`, `version`. Assignee or manager. Ticket not `RESOLVED` or `CLOSED`. Deadline is recalculated from `createdAt` plus the new policy's `resolutionTimeHours`. Activity `PRIORITY_CHANGED` with old and new values. If the new deadline is already past, `slaStatus` becomes `BREACHED` and escalation level becomes 1 in the same transaction.
+Body: `{ "priority": "HIGH" }`. A manager may change any open ticket. Staff may change priority only on a ticket assigned to them. Students get `403`. `RESOLVED` and `CLOSED` tickets return `422` `PRIORITY_LOCKED`.
 
-Other staff: `403`.
+The deadline is `createdAt + resolutionTimeHours` of the active policy for the new priority. `slaStatus` is recalculated from that deadline and the current time. Operational status and `escalationLevel` stay unchanged. A past deadline can mark `BREACHED` without assigning a manager. Sending `slaDeadline` or `slaStatus` is `400`. The activity is `PRIORITY_CHANGED`.
+
+## Activities
+
+`GET /tickets/:id/activities?page=1&limit=20`
+
+Same visibility as ticket detail. Results are oldest first. Each item has `action`, `oldValue`, `newValue`, `actor` (`id`, `name`), and `createdAt`. A hidden ticket is `404` `TICKET_NOT_FOUND`.
+
+Creating a ticket records `TICKET_CREATED`. Local MongoDB is a standalone server, so the ticket write and the activity write are sequential, not a multi-document transaction. If the activity insert fails, the service puts the ticket back to its previous values.
 
 ## Comments
 
