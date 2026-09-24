@@ -64,3 +64,16 @@ Further AI use (implementation, tests, UI) will be appended below as the prototy
 - Asked for the architecture only: workspaces, Vite React client, Express TypeScript server, Tailwind, ESLint, Prettier, Docker Compose, and `GET /api/v1/health`.
 - Did not add auth, models, or ticket routes.
 - Vite 8 failed on Node 20.17 (missing Rolldown native binding). Pinned Vite 6.4 and Tailwind 4.1 so the client build runs on this machine.
+
+### 24 September 2026 — backend foundation
+
+- Added Mongoose, a connection module, env validation, async and error middleware, and a health check that reports database status without the connection string.
+- Docker Desktop's engine was not running. MongoDB was already listening on port 27017, and the API connected to it.
+- No user or ticket schemas.
+
+### 24 September 2026 — authentication
+
+- Added the user model, bcrypt hashing, JWT access tokens, register, login, and `/auth/me`.
+- Public registration can only create students. Inactive users and unknown emails share one login error.
+- A manager-only route exists only inside the auth test, not in the running API.
+- 11 authentication tests passed. A live register, login, and `/auth/me` check also passed.
