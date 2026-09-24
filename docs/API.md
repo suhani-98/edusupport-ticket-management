@@ -245,7 +245,7 @@ The first open escalation is `LEVEL_1`. A second open one is `LEVEL_2`. A furthe
 
 ## Dashboards
 
-These are JSON summaries. There are no charts, live updates, or frontend screens.
+These are JSON summaries. There are no charts or live updates. The client has role dashboard screens that read these endpoints.
 
 | Method | Path | Role |
 |---|---|---|
@@ -263,43 +263,19 @@ The manager response is organization-wide and adds `categoryCounts` and `staffWo
 
 `overdueOpen` is a non-closed ticket whose stored `slaDeadline` is at or before now. Reading a dashboard does not rewrite `slaStatus` and does not write activities. Responses use the ticket summary shape plus `updatedAt`. They do not include `passwordHash` or comment bodies.
 
-### POST `/tickets/:ticketId/escalate`
+There is no background SLA job, no automatic escalation, and no email notification.
 
-Body: `reason`, `version`.
+## Staff directory
 
-Staff: escalation row `status: REQUESTED`. Does not change `escalationLevel`.
-
-Manager: escalation row `status: OPEN`, `escalationLevel` at least 1, activity `ESCALATED`. Ticket status unchanged.
-
-Empty reason: `400`. The SLA job is not an HTTP route. It creates the escalation, sets level 1, sets `slaStatus` to `BREACHED`, assigns the active manager, and writes `SLA_BREACHED` and `ESCALATED`. "Notify manager" is that escalation row plus the activity. There is no email sender.
-
-## Activity
-
-`GET /tickets/:ticketId/activities?page&limit`
-
-Chronological. Each item: `action`, `oldValue`, `newValue`, `actor` display name, `createdAt`. Same read permission as the ticket. Students do not receive rows whose metadata marks an internal note.
-
-## Dashboards
-
-| Method | Path | Who | Data |
-|---|---|---|---|
-| GET | `/dashboard/student` | Student | total, open, in progress, pending, resolved, closed, for their tickets only |
-| GET | `/dashboard/staff` | Staff | assigned, pending, SLA approaching, SLA breached, resolved today |
-| GET | `/dashboard/manager` | Manager | total, open, in progress, pending, resolved, SLA breached, escalated, average resolution time, staff workload |
-
-Wrong role: `403`.
+`GET /users/staff` is manager-only. It returns active users whose role is `staff`, sorted by name, with `id`, `name`, and `email`. Students, managers, and inactive users are omitted. The response does not include `passwordHash`. Staff and anonymous callers are rejected.
 
 ## Categories and SLA policies
 
 | Method | Path | Who |
 |---|---|---|
-| GET | `/categories` | Any signed-in user. Active rows only for students. Managers receive inactive rows too. |
-| POST | `/categories` | Manager. `name`, `description`, `defaultPriority`. |
-| PATCH | `/categories/:id` | Manager. Name, description, `isActive`, `defaultPriority`. |
-| GET | `/sla-policies` | Manager. |
-| PATCH | `/sla-policies/:id` | Manager. `responseTimeHours`, `resolutionTimeHours`, `isActive`. Does not rewrite deadlines already stored on tickets. |
+| GET | `/categories` | Any signed-in user. Active rows only for students and staff. Managers receive inactive rows too. |
 
-Students need `GET /categories` when creating a ticket. They do not manage policies.
+`POST /categories`, `PATCH /categories/:id`, `GET /sla-policies`, and `PATCH /sla-policies/:id` are not implemented. SLA hours stay on the seeded policies. Students need `GET /categories` when creating a ticket. They do not manage policies.
 
 ## Catalogue
 
@@ -323,6 +299,11 @@ POST   /api/v1/tickets/:ticketId/resolve
 POST   /api/v1/tickets/:ticketId/close
 POST   /api/v1/tickets/:ticketId/reopen
 POST   /api/v1/tickets/:ticketId/escalate
+GET    /api/v1/tickets/:ticketId/escalations
+POST   /api/v1/tickets/:ticketId/escalations/:escalationId/resolve
+
+PATCH  /api/v1/tickets/:ticketId/sla/refresh
+GET    /api/v1/tickets/sla-summary
 
 GET    /api/v1/tickets/:ticketId/activities
 
@@ -331,12 +312,10 @@ GET    /api/v1/dashboard/staff
 GET    /api/v1/dashboard/manager
 
 GET    /api/v1/categories
-POST   /api/v1/categories
-PATCH  /api/v1/categories/:id
-
-GET    /api/v1/sla-policies
-PATCH  /api/v1/sla-policies/:id
+GET    /api/v1/users/staff
 ```
+
+Not implemented: `POST /categories`, `PATCH /categories/:id`, `GET /sla-policies`, and `PATCH /sla-policies/:id`.
 
 ## Trade-offs
 

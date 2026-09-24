@@ -15,11 +15,11 @@ Stack, when implementation starts: React, Node.js, Express, MongoDB, REST, Tailw
 | 3. Data and architecture | `docs/DATABASE.md` | Done |
 | 4. API design | `docs/API.md` frozen at `/api/v1` | Done |
 | 5. Project setup | Monorepo, Vite client, Express server, health check | Done |
-| 6. UI/UX | Student, staff, and manager screens; timeline; analytics; filters; SLA indicators | Not started |
-| 7. Implementation | Working prototype on the stack above | Not started |
-| 8. Product-engineering extras | Breach detection, auto escalation, ageing, duplicate warning, permissions, immutable history, concurrency-safe updates, empty/loading/error states, API validation, metrics, responsive UI | Not started |
-| 9. Testing and validation | `docs/VALIDATION.md` filled with real results, including the failure cases in the brief | Not started |
-| 10. Documentation | README, architecture diagram, API docs, data model, assumptions, trade-offs, demo flow | Not started |
+| 6. UI/UX | Student, staff, and manager screens; timeline; analytics; filters; SLA indicators | Screens, timeline, filters, and SLA badges are in place. Analytics charts are not. |
+| 7. Implementation | Working prototype on the stack above | Prototype is running. Playwright is not set up. |
+| 8. Product-engineering extras | Breach detection, auto escalation, ageing, duplicate warning, permissions, immutable history, concurrency-safe updates, empty/loading/error states, API validation, metrics, responsive UI | Explicit SLA refresh, manual escalation, ageing, permissions, history, validation, metrics, and empty/loading/error states are in place. Automatic escalation and duplicate warnings are not. |
+| 9. Testing and validation | `docs/VALIDATION.md` filled with real results, including the failure cases in the brief | Server tests are recorded. Browser click-through was not run. |
+| 10. Documentation | README, architecture diagram, API docs, data model, assumptions, trade-offs, demo flow | README and the docs in this folder exist. There is no separate architecture diagram. |
 | 11. AI Usage Report | `docs/AI_USAGE_REPORT.md` kept truthful as work happens | Ongoing |
 | 12. Submission package | `docs/SUBMISSION.md` checked against the assignment | Not started |
 

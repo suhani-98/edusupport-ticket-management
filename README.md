@@ -23,7 +23,7 @@ This repository is the Edumerge Pre-Drive Product Engineering Assignment, Assign
 └── README.md
 ```
 
-Product decisions live in `docs/`. The running app does not implement them yet.
+Product decisions live in `docs/`. The current prototype is described under Current status. Charts, notifications, automatic reassignment, real-time updates, and automatic SLA monitoring are not implemented.
 
 ## Local setup
 
@@ -85,7 +85,7 @@ Do not commit `.env` files.
 | `npm run dev:client` | Vite dev server |
 | `npm run dev:server` | API with reload |
 | `npm run seed -w server` | Insert local users, categories, and SLA policies |
-| `npm test -w server` | Auth, domain, ticket, workflow, lifecycle, SLA, and dashboard tests |
+| `npm test -w server` | Auth, domain, ticket, workflow, lifecycle, SLA, dashboard, category, and staff-directory tests |
 | `npm run build` | Compile the server, then the client |
 | `npm run lint` | ESLint in both packages |
 | `npm run format` | Prettier write |

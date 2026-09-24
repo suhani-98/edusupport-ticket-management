@@ -152,3 +152,10 @@ Further AI use (implementation, tests, UI) will be appended below as the prototy
 - Shared navigation, buttons, badges, dialogs, metric cards, and page headers were aligned. The unused workspace placeholder was removed.
 - A signed-in request that is no longer authorized now says the session expired. A wrong login password still uses the existing invalid-credentials message.
 - SLA badges use the labels Within SLA, Approaching SLA, and Breached. Browser click-through was not run.
+
+### 25 September 2026 — final validation
+
+- Asked for a final audit: repository health, secrets, tests, builds, lint, seed, authorization, lifecycle, comments, SLA, escalation, assignment, dashboards, routes, API contract, and documentation. No new product features.
+- Server tests passed 39 of 39. Server build, server lint, client build, and client lint passed. Seed completed against the local database.
+- Removed the local smoke ticket EDU-1007 and its comment and activity rows. The ticket counter was left at 7. Seed users, categories, and SLA policies were kept.
+- Documentation that still described an automatic SLA job, a different escalation model, category administration, and unfinished screens was aligned with the running application. Browser click-through was not available.

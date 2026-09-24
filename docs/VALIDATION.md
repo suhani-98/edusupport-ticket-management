@@ -1,6 +1,6 @@
 # Validation and important edge cases
 
-Against `docs/WORKFLOW.md`. Not executed yet.
+Against `docs/WORKFLOW.md`. Rows below record what was actually run. Browser click-through was not run.
 
 | Case | Expected | Result |
 |---|---|---|
@@ -17,10 +17,11 @@ Against `docs/WORKFLOW.md`. Not executed yet.
 | Staff dashboard | Assigned tickets only; other role dashboards return 403 | Passed in dashboard tests (24 Sep 2026) |
 | Manager dashboard | All tickets, category counts, and active staff workload | Passed in dashboard tests (24 Sep 2026) |
 | Frontend sign-in shell | Login, student registration, protected routes, and role workspaces | Client build and lint passed (24 Sep 2026). |
-| Student ticket UI | Dashboard, list filters, create, detail, public comments, activity, close, and reopen | Client build and lint passed (24 Sep 2026). A local API check created EDU-1007, filtered it, added a public comment, closed it after staff resolved it, and rejected an empty reopen. Browser click-through was not run. Staff and manager screens are not built. |
-| Staff ticket UI | Assigned dashboard, list, status, priority, public and internal comments, resolve, SLA refresh, escalation | Client build and lint passed (24 Sep 2026). Existing server tests still cover staff permissions. Browser click-through was not run. Manager UI is not built. |
+| Student ticket UI | Dashboard, list filters, create, detail, public comments, activity, close, and reopen | Client build and lint passed (24 Sep 2026). A local API check created EDU-1007, filtered it, added a public comment, closed it after staff resolved it, and rejected an empty reopen. Browser click-through was not run. Staff and manager screens were not built in that step. |
+| Staff ticket UI | Assigned dashboard, list, status, priority, public and internal comments, resolve, SLA refresh, escalation | Client build and lint passed (24 Sep 2026). Existing server tests still cover staff permissions. Browser click-through was not run. The manager UI was not built in that step. |
 | Manager ticket UI | Organization dashboard, all-ticket filters, assignment, lifecycle, comments, SLA, escalation | Client build and lint passed (25 Sep 2026). Server tests include the manager staff directory. Browser click-through was not run. Charts, notifications, and automatic SLA jobs are not built. |
 | Product polish | Consistent shell, badges, dialogs, metric cards, and session-expired wording | Client lint, client build, and server lint passed (25 Sep 2026). Server tests stayed at 39 passed. Browser click-through was not run. |
+| Final audit | Server tests, server build, server lint, seed, client build, and client lint | 25 Sep 2026: 39 tests passed, 0 failed. Server build, server lint, client build, and client lint passed. Seed completed. Browser click-through was not available. |
 | Staff reassign | 403 | Passed in workflow tests (24 Sep 2026) |
 | Internal note on a student fetch | Omitted from comments and from activity history | Passed in lifecycle tests (24 Sep 2026) |
 | Jump from OPEN to RESOLVED | Rejected | Passed in workflow tests (24 Sep 2026) |
