@@ -117,3 +117,9 @@ Further AI use (implementation, tests, UI) will be appended below as the prototy
 - Counts come from the existing ticket and escalation collections. A dashboard read does not rewrite SLA status or write activities.
 - Each role is rejected from the other dashboards. Student counts are own tickets. Staff counts are assigned tickets. Manager counts are organization-wide.
 - 35 server tests passed. A local check of the three dashboards and the role blocks also passed. The smoke tickets were deleted.
+
+### 24 September 2026 — frontend authentication shell
+
+- Asked for the client foundation only: API client, auth context, login, student registration, and role placeholders. Ticket screens and dashboard UI were left out.
+- Registration does not return a token, so a new student is sent to sign in. The access token is kept in `localStorage` for this prototype.
+- Role paths are a UI redirect. The API still decides what each role can do.

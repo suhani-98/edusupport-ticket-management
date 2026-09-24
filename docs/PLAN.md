@@ -25,7 +25,7 @@ Stack, when implementation starts: React, Node.js, Express, MongoDB, REST, Tailw
 
 `docs/PRD.md`, `docs/WORKFLOW.md`, `docs/DATABASE.md`, and `docs/API.md` are the source of truth. `docs/APPROACH.md` is an older draft and must not be used for SLA or status rules.
 
-Ticket APIs, explicit SLA refresh, manual escalation, activity history, and role dashboard APIs are implemented. Automatic SLA monitoring, notifications, charts, and ticket screens are not.
+Ticket APIs, explicit SLA refresh, manual escalation, activity history, role dashboard APIs, and the frontend sign-in shell are implemented. Ticket screens, dashboard charts, notifications, and automatic SLA monitoring are not.
 
 ## What we will submit
 

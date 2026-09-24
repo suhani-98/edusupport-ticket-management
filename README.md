@@ -74,7 +74,7 @@ Client (`client/.env.example`):
 
 | Name | Purpose |
 |---|---|
-| `VITE_API_URL` | API origin, default `http://localhost:4000` |
+| `VITE_API_URL` | API base, `http://localhost:4000/api/v1` |
 
 Do not commit `.env` files.
 
@@ -92,4 +92,4 @@ Do not commit `.env` files.
 
 ## Current status
 
-Authentication, tickets, assignment, status, priority, comments, resolve, close, reopen, explicit SLA refresh, manual escalation, activity history, and role dashboard APIs are in place. Automatic SLA monitoring, notifications, charts, and the ticket UI are not implemented. See `docs/API.md`.
+The API covers authentication, tickets, comments, lifecycle, SLA refresh, manual escalation, and role dashboard summaries. The client can register a student, sign in, restore a session, and open a temporary workspace for that role. The JWT is stored in `localStorage` under `edusupport_token` for this prototype. A production deployment could move that token to a hardened cookie. Ticket screens, dashboard charts, notifications, and automatic SLA monitoring are not implemented. See `docs/API.md`.
