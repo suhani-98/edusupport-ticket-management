@@ -20,6 +20,7 @@ function queryString(params: TicketListParams): string {
     ["priority", params.priority],
     ["slaStatus", params.slaStatus],
     ["categoryId", params.categoryId],
+    ["assignedTo", params.assignedTo],
     ["overdue", params.overdue === undefined ? undefined : String(params.overdue)],
     ["search", params.search],
     ["sortBy", params.sortBy],
@@ -40,6 +41,17 @@ export function getMyTickets(params: TicketListParams): Promise<TicketListRespon
 
 export function getAssignedTickets(params: TicketListParams): Promise<TicketListResponse> {
   return getMyTickets(params);
+}
+
+export function getAllTickets(params: TicketListParams): Promise<TicketListResponse> {
+  return getMyTickets(params);
+}
+
+export function assignTicket(ticketId: string, staffId: string): Promise<{ ticket: TicketDetail }> {
+  return apiRequest<{ ticket: TicketDetail }>(`/tickets/${ticketId}/assignment`, {
+    method: "PATCH",
+    body: JSON.stringify({ assignedTo: staffId }),
+  });
 }
 
 export function getTicket(id: string): Promise<{ ticket: TicketDetail }> {

@@ -9,10 +9,12 @@ export function TicketList({
   tickets,
   hrefFor = (id: string) => `/student/tickets/${id}`,
   showAge = false,
+  showAssignee = false,
 }: {
   tickets: TicketSummary[];
   hrefFor?: (id: string) => string;
   showAge?: boolean;
+  showAssignee?: boolean;
 }) {
   return (
     <>
@@ -29,6 +31,9 @@ export function TicketList({
               {ticket.subject}
             </Link>
             <p className="mt-1 text-sm text-slate-600">{ticket.category?.name ?? "Uncategorised"}</p>
+            {showAssignee ? (
+              <p className="mt-1 text-sm text-slate-600">Assigned: {ticket.assignedTo?.name ?? "Unassigned"}</p>
+            ) : null}
             <div className="mt-3 flex flex-wrap gap-2">
               <TicketPriorityBadge priority={ticket.priority} />
               <TicketSlaBadge slaStatus={ticket.slaStatus} />
@@ -47,6 +52,7 @@ export function TicketList({
               <th className="px-4 py-3 font-semibold">Ticket #</th>
               <th className="px-4 py-3 font-semibold">Subject</th>
               <th className="px-4 py-3 font-semibold">Category</th>
+              {showAssignee ? <th className="px-4 py-3 font-semibold">Assigned</th> : null}
               <th className="px-4 py-3 font-semibold">Priority</th>
               <th className="px-4 py-3 font-semibold">Status</th>
               <th className="px-4 py-3 font-semibold">SLA</th>
@@ -69,6 +75,7 @@ export function TicketList({
                   </Link>
                 </td>
                 <td className="px-4 py-3 text-slate-700">{ticket.category?.name ?? "—"}</td>
+                {showAssignee ? <td className="px-4 py-3 text-slate-700">{ticket.assignedTo?.name ?? "Unassigned"}</td> : null}
                 <td className="px-4 py-3">
                   <TicketPriorityBadge priority={ticket.priority} />
                 </td>

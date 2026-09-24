@@ -12,16 +12,23 @@ export function TicketWorkflowActions({
   loading,
   onStatus,
   onResolve,
+  showAssign = false,
+  onClose,
+  onReopen,
 }: {
   status: TicketStatus;
   loading: boolean;
   onStatus: (status: TicketStatus) => void;
   onResolve: () => void;
+  showAssign?: boolean;
+  onClose?: () => void;
+  onReopen?: () => void;
 }) {
-  const action = nextActions[status];
+  const action =
+    status === "OPEN" && showAssign ? { status: "ASSIGNED" as const, label: "Mark assigned" } : nextActions[status];
   const canResolve = status === "IN_PROGRESS";
-  if (!action && !canResolve) {
-    return <p className="text-sm text-slate-600">No staff status change is available for this ticket.</p>;
+  if (!action && !canResolve && !onClose && !onReopen) {
+    return <p className="text-sm text-slate-600">No status change is available for this ticket.</p>;
   }
   return (
     <div className="flex flex-wrap gap-2">
@@ -33,6 +40,16 @@ export function TicketWorkflowActions({
       {canResolve ? (
         <Button type="button" onClick={onResolve} className="bg-slate-800 hover:bg-slate-900">
           Resolve Ticket
+        </Button>
+      ) : null}
+      {status === "RESOLVED" && onClose ? (
+        <Button type="button" loading={loading} onClick={onClose}>
+          Close Ticket
+        </Button>
+      ) : null}
+      {status === "CLOSED" && onReopen ? (
+        <Button type="button" onClick={onReopen}>
+          Reopen Ticket
         </Button>
       ) : null}
     </div>

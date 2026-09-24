@@ -8,6 +8,7 @@ import { categoryRouter } from "./routes/category.routes.js";
 import { healthRouter } from "./routes/health.routes.js";
 import { dashboardRouter } from "./routes/dashboard.routes.js";
 import { ticketRouter } from "./routes/ticket.routes.js";
+import { userRouter } from "./routes/user.routes.js";
 
 export function createApp(configure?: (app: Express) => void) {
   const app = express();
@@ -25,6 +26,7 @@ export function createApp(configure?: (app: Express) => void) {
   app.use("/api/v1/tickets", ticketRouter);
   app.use("/api/v1/categories", categoryRouter);
   app.use("/api/v1/dashboard", dashboardRouter);
+  app.use("/api/v1/users", userRouter);
   configure?.(app);
   app.use(notFound);
   app.use(errorHandler);

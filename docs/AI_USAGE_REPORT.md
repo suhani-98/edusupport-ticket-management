@@ -138,3 +138,10 @@ Further AI use (implementation, tests, UI) will be appended below as the prototy
 - Status buttons follow the existing transitions: Assigned to In Progress, In Progress to Pending, and Pending back to In Progress. Resolve uses the dedicated resolve endpoint. Close, reopen, and assignment controls are not shown.
 - Ticket age is calculated in the browser from `createdAt`. SLA status still comes from the stored field, including after an explicit refresh.
 - Internal notes stay in their own panel. The activity timeline says an internal note was added and does not repeat the note text.
+
+### 25 September 2026 — manager workspace
+
+- Asked for the organization dashboard, all-ticket management, assignment, lifecycle actions, comments, SLA refresh, and escalations. Charts, notifications, background jobs, and automatic reassignment were left out.
+- `POST /tickets` remains student-only, so the manager screen has no create-ticket action.
+- There was no staff directory. `GET /users/staff` was added for managers only. It returns active staff id, name, and email, and never a password hash. Inactive staff, students, and managers are omitted.
+- Assignment sends only `assignedTo`. The API does not support clearing an assignee.

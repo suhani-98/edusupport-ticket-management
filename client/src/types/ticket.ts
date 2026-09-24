@@ -42,6 +42,12 @@ export type TicketCategory = {
   name: string;
 };
 
+export type TicketPerson = {
+  id: string;
+  name: string;
+  email: string;
+};
+
 export type TicketSummary = {
   id: string;
   ticketNumber: string;
@@ -51,12 +57,14 @@ export type TicketSummary = {
   status: TicketStatus;
   slaStatus: SlaStatus;
   slaDeadline: string;
+  assignedTo: TicketPerson | null;
   createdAt: string;
   updatedAt: string;
 };
 
 export type TicketDetail = TicketSummary & {
   description: string;
+  student: TicketPerson | null;
   resolution: string | null;
   resolvedAt: string | null;
   closedAt: string | null;
@@ -79,6 +87,7 @@ export type TicketListParams = {
   priority?: TicketPriority;
   slaStatus?: SlaStatus;
   categoryId?: string;
+  assignedTo?: string;
   overdue?: boolean;
   search?: string;
   sortBy?: "createdAt" | "updatedAt" | "ticketNumber";
@@ -117,6 +126,50 @@ export type StaffDashboard = {
     level2: number;
   };
   recentTickets: TicketSummary[];
+};
+
+export type CategoryCount = {
+  categoryId: string;
+  categoryName: string;
+  count: number;
+};
+
+export type StaffWorkload = {
+  staffId: string;
+  name: string;
+  assigned: number;
+  inProgress: number;
+  pending: number;
+  breached: number;
+};
+
+export type ManagerDashboard = {
+  ticketCounts: {
+    total: number;
+    open: number;
+    assigned: number;
+    inProgress: number;
+    pending: number;
+    resolved: number;
+    closed: number;
+  };
+  priorityCounts: {
+    low: number;
+    medium: number;
+    high: number;
+    critical: number;
+  };
+  slaCounts: StaffDashboard["slaCounts"];
+  escalationCounts: StaffDashboard["escalationCounts"];
+  categoryCounts: CategoryCount[];
+  staffWorkload: StaffWorkload[];
+  recentTickets: TicketSummary[];
+};
+
+export type StaffUser = {
+  id: string;
+  name: string;
+  email: string;
 };
 
 export type Comment = {

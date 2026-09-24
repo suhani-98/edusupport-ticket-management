@@ -19,6 +19,7 @@ Against `docs/WORKFLOW.md`. Not executed yet.
 | Frontend sign-in shell | Login, student registration, protected routes, and role workspaces | Client build and lint passed (24 Sep 2026). |
 | Student ticket UI | Dashboard, list filters, create, detail, public comments, activity, close, and reopen | Client build and lint passed (24 Sep 2026). A local API check created EDU-1007, filtered it, added a public comment, closed it after staff resolved it, and rejected an empty reopen. Browser click-through was not run. Staff and manager screens are not built. |
 | Staff ticket UI | Assigned dashboard, list, status, priority, public and internal comments, resolve, SLA refresh, escalation | Client build and lint passed (24 Sep 2026). Existing server tests still cover staff permissions. Browser click-through was not run. Manager UI is not built. |
+| Manager ticket UI | Organization dashboard, all-ticket filters, assignment, lifecycle, comments, SLA, escalation | Client build and lint passed (25 Sep 2026). Server tests include the manager staff directory. Browser click-through was not run. Charts, notifications, and automatic SLA jobs are not built. |
 | Staff reassign | 403 | Passed in workflow tests (24 Sep 2026) |
 | Internal note on a student fetch | Omitted from comments and from activity history | Passed in lifecycle tests (24 Sep 2026) |
 | Jump from OPEN to RESOLVED | Rejected | Passed in workflow tests (24 Sep 2026) |

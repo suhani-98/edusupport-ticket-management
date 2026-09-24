@@ -7,6 +7,7 @@ import {
   slaStatuses,
   SEARCH_MAX_LENGTH,
   type Category,
+  type StaffUser,
   type TicketListParams,
 } from "../../types/ticket";
 import { Button } from "../ui/Button";
@@ -17,11 +18,15 @@ const selectClass =
 export function StaffTicketFilters({
   value,
   categories,
+  staff = [],
+  showStaffFilter = false,
   onChange,
   onClear,
 }: {
   value: TicketListParams;
   categories: Category[];
+  staff?: StaffUser[];
+  showStaffFilter?: boolean;
   onChange: (next: TicketListParams) => void;
   onClear: () => void;
 }) {
@@ -97,6 +102,23 @@ export function StaffTicketFilters({
           ))}
         </select>
       </label>
+      {showStaffFilter ? (
+      <label className="block text-sm font-medium text-slate-800">
+        Assigned staff
+        <select
+          value={value.assignedTo ?? ""}
+          onChange={(event) => onChange({ ...value, assignedTo: event.target.value || undefined, page: 1 })}
+          className={selectClass}
+        >
+          <option value="">Anyone</option>
+          {staff.map((person) => (
+            <option key={person.id} value={person.id}>
+              {person.name}
+            </option>
+          ))}
+        </select>
+      </label>
+      ) : null}
       <label className="block text-sm font-medium text-slate-800">
         SLA
         <select

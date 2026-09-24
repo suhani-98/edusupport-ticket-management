@@ -31,3 +31,8 @@ export function formatAge(createdAt: string, now = Date.now()): string {
   }
   return `${mins}m`;
 }
+
+export function deadlineHasPassed(value: string): boolean {
+  const deadline = new Date(value).getTime();
+  return !Number.isNaN(deadline) && deadline <= Date.now();
+}
