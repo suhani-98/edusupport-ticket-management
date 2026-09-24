@@ -7,6 +7,9 @@ import { CreateTicketPage } from "../pages/CreateTicketPage";
 import { StudentDashboardPage } from "../pages/StudentDashboardPage";
 import { TicketDetailPage } from "../pages/TicketDetailPage";
 import { TicketListPage } from "../pages/TicketListPage";
+import { StaffDashboardPage } from "../pages/StaffDashboardPage";
+import { StaffTicketDetailPage } from "../pages/StaffTicketDetailPage";
+import { StaffTicketListPage } from "../pages/StaffTicketListPage";
 import { WorkspacePage } from "../pages/WorkspacePage";
 import { GuestRoute, HomeRedirect, ProtectedRoute, RoleRoute } from "./guards";
 
@@ -29,7 +32,9 @@ export function AppRoutes() {
                 <Route path="/student/tickets/:id" element={<TicketDetailPage />} />
               </Route>
               <Route element={<RoleRoute role="staff" />}>
-                <Route path="/staff" element={<WorkspacePage />} />
+                <Route path="/staff" element={<StaffDashboardPage />} />
+                <Route path="/staff/tickets" element={<StaffTicketListPage />} />
+                <Route path="/staff/tickets/:id" element={<StaffTicketDetailPage />} />
               </Route>
               <Route element={<RoleRoute role="manager" />}>
                 <Route path="/manager" element={<WorkspacePage />} />

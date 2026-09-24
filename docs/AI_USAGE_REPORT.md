@@ -131,3 +131,10 @@ Further AI use (implementation, tests, UI) will be appended below as the prototy
 - The list summary now includes `updatedAt`, which the ticket list shows. The client does not calculate SLA status. It shows the stored `slaStatus` and the deadline separately.
 - Students cannot pick comment type. The client always sends `PUBLIC` and never sends `authorId`. Activity rows hide raw ids and internal comment events.
 - Staff UI, manager UI, charts, notifications, and automatic SLA monitoring are not implemented.
+
+### 24 September 2026 — staff assigned-ticket desk
+
+- Asked for the staff dashboard, assigned ticket list, workflow, public and internal comments, resolve, SLA refresh, escalation, and ageing. Manager screens were left out.
+- Status buttons follow the existing transitions: Assigned to In Progress, In Progress to Pending, and Pending back to In Progress. Resolve uses the dedicated resolve endpoint. Close, reopen, and assignment controls are not shown.
+- Ticket age is calculated in the browser from `createdAt`. SLA status still comes from the stored field, including after an explicit refresh.
+- Internal notes stay in their own panel. The activity timeline says an internal note was added and does not repeat the note text.

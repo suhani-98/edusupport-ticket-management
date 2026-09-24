@@ -1,5 +1,15 @@
 import { apiRequest } from "./api";
-import type { Activity, Comment, TicketDetail, TicketListParams, TicketListResponse } from "../types/ticket";
+import type {
+  Activity,
+  Comment,
+  CommentType,
+  Escalation,
+  TicketDetail,
+  TicketListParams,
+  TicketListResponse,
+  TicketPriority,
+  TicketStatus,
+} from "../types/ticket";
 
 function queryString(params: TicketListParams): string {
   const search = new URLSearchParams();
@@ -9,6 +19,8 @@ function queryString(params: TicketListParams): string {
     ["status", params.status],
     ["priority", params.priority],
     ["slaStatus", params.slaStatus],
+    ["categoryId", params.categoryId],
+    ["overdue", params.overdue === undefined ? undefined : String(params.overdue)],
     ["search", params.search],
     ["sortBy", params.sortBy],
     ["sortOrder", params.sortOrder],
@@ -24,6 +36,10 @@ function queryString(params: TicketListParams): string {
 
 export function getMyTickets(params: TicketListParams): Promise<TicketListResponse> {
   return apiRequest<TicketListResponse>(`/tickets${queryString(params)}`);
+}
+
+export function getAssignedTickets(params: TicketListParams): Promise<TicketListResponse> {
+  return getMyTickets(params);
 }
 
 export function getTicket(id: string): Promise<{ ticket: TicketDetail }> {
@@ -46,10 +62,57 @@ export function getComments(ticketId: string): Promise<{ comments: Comment[] }> 
 }
 
 export function addPublicComment(ticketId: string, message: string): Promise<{ comment: Comment }> {
+  return addComment(ticketId, message, "PUBLIC");
+}
+
+export function addComment(ticketId: string, message: string, type: CommentType): Promise<{ comment: Comment }> {
   return apiRequest<{ comment: Comment }>(`/tickets/${ticketId}/comments`, {
     method: "POST",
-    body: JSON.stringify({ message, type: "PUBLIC" }),
+    body: JSON.stringify({ message, type }),
   });
+}
+
+export function updateTicketStatus(ticketId: string, status: TicketStatus): Promise<{ ticket: TicketDetail }> {
+  return apiRequest<{ ticket: TicketDetail }>(`/tickets/${ticketId}/status`, {
+    method: "PATCH",
+    body: JSON.stringify({ status }),
+  });
+}
+
+export function updateTicketPriority(ticketId: string, priority: TicketPriority): Promise<{ ticket: TicketDetail }> {
+  return apiRequest<{ ticket: TicketDetail }>(`/tickets/${ticketId}/priority`, {
+    method: "PATCH",
+    body: JSON.stringify({ priority }),
+  });
+}
+
+export function resolveTicket(ticketId: string, resolution: string): Promise<{ ticket: TicketDetail }> {
+  return apiRequest<{ ticket: TicketDetail }>(`/tickets/${ticketId}/resolve`, {
+    method: "POST",
+    body: JSON.stringify({ resolution }),
+  });
+}
+
+export function refreshTicketSla(ticketId: string): Promise<{ ticket: TicketDetail }> {
+  return apiRequest<{ ticket: TicketDetail }>(`/tickets/${ticketId}/sla/refresh`, { method: "PATCH" });
+}
+
+export function getEscalations(ticketId: string): Promise<{ escalations: Escalation[] }> {
+  return apiRequest<{ escalations: Escalation[] }>(`/tickets/${ticketId}/escalations`);
+}
+
+export function escalateTicket(ticketId: string, reason: string): Promise<{ escalation: Escalation; ticket: TicketDetail }> {
+  return apiRequest<{ escalation: Escalation; ticket: TicketDetail }>(`/tickets/${ticketId}/escalate`, {
+    method: "POST",
+    body: JSON.stringify({ reason }),
+  });
+}
+
+export function resolveEscalation(ticketId: string, escalationId: string): Promise<{ escalation: Escalation; ticket: TicketDetail }> {
+  return apiRequest<{ escalation: Escalation; ticket: TicketDetail }>(
+    `/tickets/${ticketId}/escalations/${escalationId}/resolve`,
+    { method: "POST" },
+  );
 }
 
 export function getActivities(ticketId: string): Promise<{ activities: Activity[] }> {

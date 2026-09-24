@@ -5,10 +5,11 @@ import { TicketPriorityBadge } from "./TicketPriorityBadge";
 import { TicketSlaBadge } from "./TicketSlaBadge";
 import { TicketStatusBadge } from "./TicketStatusBadge";
 
-export function TicketCard({ ticket }: { ticket: TicketSummary }) {
+export function TicketCard({ ticket, href }: { ticket: TicketSummary; href?: string }) {
+  const to = href ?? `/student/tickets/${ticket.id}`;
   return (
     <Link
-      to={`/student/tickets/${ticket.id}`}
+      to={to}
       className="block rounded-xl border border-slate-200 bg-white p-4 shadow-sm transition hover:border-teal-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-800"
     >
       <div className="flex flex-wrap items-center justify-between gap-2">

@@ -1,10 +1,18 @@
 import { formatDateTime } from "../../lib/format";
 import type { Comment } from "../../types/ticket";
 
-export function CommentList({ comments }: { comments: Comment[] }) {
-  const visible = comments.filter((comment) => comment.type === "PUBLIC");
+export function CommentList({
+  comments,
+  type = "PUBLIC",
+  emptyLabel = "No public comments yet.",
+}: {
+  comments: Comment[];
+  type?: Comment["type"];
+  emptyLabel?: string;
+}) {
+  const visible = comments.filter((comment) => comment.type === type);
   if (visible.length === 0) {
-    return <p className="text-sm text-slate-600">No public comments yet.</p>;
+    return <p className="text-sm text-slate-600">{emptyLabel}</p>;
   }
   return (
     <ol className="space-y-3">

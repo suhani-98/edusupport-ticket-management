@@ -6,9 +6,13 @@ import { TextArea } from "../ui/TextArea";
 export function CommentComposer({
   onSubmit,
   error,
+  label = "Public comment",
+  buttonLabel = "Add Comment",
 }: {
   onSubmit: (message: string) => Promise<void>;
   error: string;
+  label?: string;
+  buttonLabel?: string;
 }) {
   const [message, setMessage] = useState("");
   const [fieldError, setFieldError] = useState("");
@@ -40,7 +44,7 @@ export function CommentComposer({
   return (
     <form onSubmit={handleSubmit} className="space-y-3">
       <TextArea
-        label="Public comment"
+        label={label}
         name="comment"
         value={message}
         maxLength={COMMENT_MAX_LENGTH}
@@ -50,7 +54,7 @@ export function CommentComposer({
       />
       {error ? <p className="text-sm text-red-700">{error}</p> : null}
       <Button type="submit" loading={loading}>
-        Add Comment
+        {buttonLabel}
       </Button>
     </form>
   );

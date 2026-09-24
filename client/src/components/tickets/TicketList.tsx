@@ -1,23 +1,31 @@
 import { Link } from "react-router-dom";
-import { formatDateTime } from "../../lib/format";
+import { formatAge, formatDateTime } from "../../lib/format";
 import type { TicketSummary } from "../../types/ticket";
 import { TicketPriorityBadge } from "./TicketPriorityBadge";
 import { TicketSlaBadge } from "./TicketSlaBadge";
 import { TicketStatusBadge } from "./TicketStatusBadge";
 
-export function TicketList({ tickets }: { tickets: TicketSummary[] }) {
+export function TicketList({
+  tickets,
+  hrefFor = (id: string) => `/student/tickets/${id}`,
+  showAge = false,
+}: {
+  tickets: TicketSummary[];
+  hrefFor?: (id: string) => string;
+  showAge?: boolean;
+}) {
   return (
     <>
       <div className="space-y-3 md:hidden">
         {tickets.map((ticket) => (
           <article key={ticket.id} className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
             <div className="flex items-center justify-between gap-2">
-              <Link to={`/student/tickets/${ticket.id}`} className="font-semibold text-teal-900 hover:underline">
+              <Link to={hrefFor(ticket.id)} className="font-semibold text-teal-900 hover:underline">
                 {ticket.ticketNumber}
               </Link>
               <TicketStatusBadge status={ticket.status} />
             </div>
-            <Link to={`/student/tickets/${ticket.id}`} className="mt-2 block font-medium text-slate-900 hover:underline">
+            <Link to={hrefFor(ticket.id)} className="mt-2 block font-medium text-slate-900 hover:underline">
               {ticket.subject}
             </Link>
             <p className="mt-1 text-sm text-slate-600">{ticket.category?.name ?? "Uncategorised"}</p>
@@ -27,6 +35,7 @@ export function TicketList({ tickets }: { tickets: TicketSummary[] }) {
             </div>
             <p className="mt-3 text-xs text-slate-500">
               Created {formatDateTime(ticket.createdAt)} · Updated {formatDateTime(ticket.updatedAt)}
+              {showAge ? ` · Age ${formatAge(ticket.createdAt)}` : ""}
             </p>
           </article>
         ))}
@@ -43,18 +52,19 @@ export function TicketList({ tickets }: { tickets: TicketSummary[] }) {
               <th className="px-4 py-3 font-semibold">SLA</th>
               <th className="px-4 py-3 font-semibold">Created</th>
               <th className="px-4 py-3 font-semibold">Updated</th>
+              {showAge ? <th className="px-4 py-3 font-semibold">Age</th> : null}
             </tr>
           </thead>
           <tbody>
             {tickets.map((ticket) => (
               <tr key={ticket.id} className="border-b border-slate-100 last:border-0">
                 <td className="px-4 py-3 font-semibold text-teal-900">
-                  <Link to={`/student/tickets/${ticket.id}`} className="hover:underline">
+                  <Link to={hrefFor(ticket.id)} className="hover:underline">
                     {ticket.ticketNumber}
                   </Link>
                 </td>
                 <td className="px-4 py-3">
-                  <Link to={`/student/tickets/${ticket.id}`} className="font-medium text-slate-900 hover:underline">
+                  <Link to={hrefFor(ticket.id)} className="font-medium text-slate-900 hover:underline">
                     {ticket.subject}
                   </Link>
                 </td>
@@ -70,6 +80,7 @@ export function TicketList({ tickets }: { tickets: TicketSummary[] }) {
                 </td>
                 <td className="px-4 py-3 whitespace-nowrap text-slate-600">{formatDateTime(ticket.createdAt)}</td>
                 <td className="px-4 py-3 whitespace-nowrap text-slate-600">{formatDateTime(ticket.updatedAt)}</td>
+                {showAge ? <td className="px-4 py-3 whitespace-nowrap text-slate-600">{formatAge(ticket.createdAt)}</td> : null}
               </tr>
             ))}
           </tbody>

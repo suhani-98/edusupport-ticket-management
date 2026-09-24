@@ -2,9 +2,15 @@ import { activityCopy } from "../../lib/activityCopy";
 import { formatDateTime } from "../../lib/format";
 import type { Activity } from "../../types/ticket";
 
-export function ActivityTimeline({ activities }: { activities: Activity[] }) {
+export function ActivityTimeline({
+  activities,
+  audience = "student",
+}: {
+  activities: Activity[];
+  audience?: "student" | "staff";
+}) {
   const items = activities
-    .map((activity) => ({ activity, copy: activityCopy(activity) }))
+    .map((activity) => ({ activity, copy: activityCopy(activity, audience) }))
     .filter((item): item is { activity: Activity; copy: { title: string; detail?: string } } => item.copy !== null);
 
   if (items.length === 0) {

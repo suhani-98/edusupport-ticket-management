@@ -3,6 +3,7 @@ import { Badge } from "../components/ui/Badge";
 import { Button } from "../components/ui/Button";
 import { useAuth } from "../context/useAuth";
 import { roleLabels } from "../types/auth";
+import { StaffNav } from "./StaffNav";
 import { StudentNav } from "./StudentNav";
 
 export function AppShell() {
@@ -23,6 +24,7 @@ export function AppShell() {
             </div>
             </div>
             {user?.role === "student" ? <StudentNav /> : null}
+            {user?.role === "staff" ? <StaffNav /> : null}
           </div>
           {user ? (
             <div className="flex items-center gap-3">

@@ -33,6 +33,8 @@ export const SUBJECT_MAX_LENGTH = 140;
 export const DESCRIPTION_MAX_LENGTH = 4000;
 export const COMMENT_MAX_LENGTH = 2000;
 export const REOPEN_REASON_MAX_LENGTH = 1000;
+export const RESOLUTION_MAX_LENGTH = 4000;
+export const ESCALATION_REASON_MAX_LENGTH = 1000;
 export const SEARCH_MAX_LENGTH = 100;
 
 export type TicketCategory = {
@@ -76,15 +78,51 @@ export type TicketListParams = {
   status?: TicketStatus;
   priority?: TicketPriority;
   slaStatus?: SlaStatus;
+  categoryId?: string;
+  overdue?: boolean;
   search?: string;
   sortBy?: "createdAt" | "updatedAt" | "ticketNumber";
   sortOrder?: "asc" | "desc";
 };
 
+export type CommentType = "PUBLIC" | "INTERNAL";
+
+export type Escalation = {
+  id: string;
+  level: "LEVEL_1" | "LEVEL_2";
+  status: "OPEN" | "RESOLVED";
+  reason: string;
+  triggeredBy: { name: string } | null;
+  createdAt: string;
+  resolvedAt: string | null;
+};
+
+export type StaffDashboard = {
+  ticketCounts: {
+    assigned: number;
+    inProgress: number;
+    pending: number;
+    resolved: number;
+    closed: number;
+  };
+  slaCounts: {
+    withinSla: number;
+    approachingSla: number;
+    breached: number;
+    overdueOpen: number;
+  };
+  escalationCounts: {
+    open: number;
+    level1: number;
+    level2: number;
+  };
+  recentTickets: TicketSummary[];
+};
+
 export type Comment = {
   id: string;
   message: string;
-  type: "PUBLIC" | "INTERNAL";
+  type: CommentType;
   author: { id?: string; name: string } | null;
   createdAt: string;
   updatedAt: string;

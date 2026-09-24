@@ -7,9 +7,15 @@ function safeText(value: string | null): string | null {
   return value;
 }
 
-export function activityCopy(activity: Activity): { title: string; detail?: string } | null {
+export function activityCopy(
+  activity: Activity,
+  audience: "student" | "staff" = "student",
+): { title: string; detail?: string } | null {
   if (activity.action === "COMMENT_ADDED" && activity.newValue === "INTERNAL") {
-    return null;
+    if (audience === "student") {
+      return null;
+    }
+    return { title: "Internal note added" };
   }
 
   switch (activity.action) {
@@ -48,7 +54,10 @@ export function activityCopy(activity: Activity): { title: string; detail?: stri
     case "COMMENT_ADDED":
       return { title: "Public comment added" };
     case "ESCALATED":
-      return { title: "Ticket escalated" };
+      return {
+        title: "Ticket escalated",
+        detail: activity.newValue === "LEVEL_1" ? "Level 1" : activity.newValue === "LEVEL_2" ? "Level 2" : undefined,
+      };
     case "ESCALATION_RESOLVED":
       return { title: "Escalation resolved" };
     default:
