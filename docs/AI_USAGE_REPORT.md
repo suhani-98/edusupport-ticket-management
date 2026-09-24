@@ -96,3 +96,10 @@ Further AI use (implementation, tests, UI) will be appended below as the prototy
 - Managers assign only to active staff. Reassignment does not change operational status. Priority recalculates the deadline from the original `createdAt` and does not raise `escalationLevel`.
 - Local MongoDB is standalone, so ticket and activity writes are sequential with a compensating update if the activity insert fails. They are not a transaction.
 - 30 server tests passed. A local assign, reassign, invalid transition, status change, priority change, and activity list also passed. The smoke ticket was deleted.
+
+### 24 September 2026 — comments, resolve, close, and reopen
+
+- Asked for public and internal comments, resolve, close, and reopen. Dashboards, notifications, and automatic SLA escalation were left out.
+- Students see only public comments. Staff cannot close or reopen. Reopen clears the stored resolution and timestamps, keeps the old resolution on the `REOPENED` activity, and does not move the SLA deadline.
+- Pending still does not pause the SLA.
+- 32 server tests passed. A local public comment, internal comment, resolve, close, reopen, and activity check also passed. The smoke ticket was deleted.

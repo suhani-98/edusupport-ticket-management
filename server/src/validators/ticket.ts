@@ -1,11 +1,16 @@
 import { Types } from "mongoose";
 import { AppError } from "../utils/AppError.js";
 import {
+  COMMENT_MAX_LENGTH,
   DESCRIPTION_MAX_LENGTH,
+  REOPEN_REASON_MAX_LENGTH,
+  RESOLUTION_MAX_LENGTH,
   SUBJECT_MAX_LENGTH,
+  commentTypes,
   slaStatuses,
   ticketPriorities,
   ticketStatuses,
+  type CommentType,
   type SlaStatus,
   type TicketPriority,
   type TicketStatus,
@@ -207,4 +212,37 @@ export function validateActivityListQuery(query: Record<string, unknown>): Activ
     throw new AppError(400, "VALIDATION_ERROR", "limit must be an integer from 1 to 100.");
   }
   return { page, limit };
+}
+
+function requiredText(value: unknown, field: string, max: number): string {
+  if (typeof value !== "string" || value.trim().length === 0) {
+    throw new AppError(400, "VALIDATION_ERROR", `${field} is required.`);
+  }
+  const text = value.trim();
+  if (text.length > max) {
+    throw new AppError(400, "VALIDATION_ERROR", `${field} must be at most ${max} characters.`);
+  }
+  return text;
+}
+
+export function validateCommentBody(body: unknown): { message: string; type: CommentType } {
+  const record = requireObject(body);
+  rejectFields(record, ["authorId", "ticketId", "createdAt"]);
+  const message = requiredText(record.message, "Message", COMMENT_MAX_LENGTH);
+  if (typeof record.type !== "string" || !commentTypes.includes(record.type as CommentType)) {
+    throw new AppError(400, "VALIDATION_ERROR", "type must be PUBLIC or INTERNAL.");
+  }
+  return { message, type: record.type as CommentType };
+}
+
+export function validateResolutionBody(body: unknown): { resolution: string } {
+  const record = requireObject(body);
+  rejectFields(record, ["status", "resolvedAt", "closedAt", "authorId"]);
+  return { resolution: requiredText(record.resolution, "Resolution", RESOLUTION_MAX_LENGTH) };
+}
+
+export function validateReopenBody(body: unknown): { reason: string } {
+  const record = requireObject(body);
+  rejectFields(record, ["status", "resolvedAt", "closedAt", "resolution"]);
+  return { reason: requiredText(record.reason, "Reason", REOPEN_REASON_MAX_LENGTH) };
 }

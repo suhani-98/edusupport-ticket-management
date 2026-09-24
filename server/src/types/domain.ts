@@ -25,11 +25,17 @@ export const activityActions = [
   "RESOLVED",
   "CLOSED",
   "REOPENED",
+  "COMMENT_ADDED",
 ] as const;
 export type ActivityAction = (typeof activityActions)[number];
+
+export const commentTypes = ["PUBLIC", "INTERNAL"] as const;
+export type CommentType = (typeof commentTypes)[number];
 
 export const SUBJECT_MAX_LENGTH = 140;
 export const DESCRIPTION_MAX_LENGTH = 4000;
 export const RESOLUTION_MAX_LENGTH = 4000;
+export const COMMENT_MAX_LENGTH = 2000;
+export const REOPEN_REASON_MAX_LENGTH = 1000;
 export const CATEGORY_NAME_MAX_LENGTH = 80;
 export const CATEGORY_DESCRIPTION_MAX_LENGTH = 500;

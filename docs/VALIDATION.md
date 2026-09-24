@@ -14,7 +14,7 @@ Against `docs/WORKFLOW.md`. Not executed yet.
 | Duplicate open ticket in the same category | Existing numbers returned; confirm still creates | Planned |
 | Student GET of another student's ticket | 404 `TICKET_NOT_FOUND`, same as a missing ticket | Passed in ticket API tests (24 Sep 2026) |
 | Staff reassign | 403 | Passed in workflow tests (24 Sep 2026) |
-| Internal note on a student fetch | Omitted | Planned |
-| Jump from OPEN to RESOLVED | Rejected | Planned |
-| Student close from RESOLVED | Status CLOSED | Planned |
-| Student reopen after 7 days | Rejected | Planned |
+| Internal note on a student fetch | Omitted from comments and from activity history | Passed in lifecycle tests (24 Sep 2026) |
+| Jump from OPEN to RESOLVED | Rejected | Passed in workflow tests (24 Sep 2026) |
+| Student close from RESOLVED | Status CLOSED, closedAt set | Passed in lifecycle tests (24 Sep 2026) |
+| Student reopen of a CLOSED ticket | Status IN_PROGRESS; resolution and timestamps cleared; prior resolution kept on the REOPENED activity; SLA deadline unchanged | Passed in lifecycle tests (24 Sep 2026). No 7-day limit in this step. |

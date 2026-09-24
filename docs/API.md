@@ -156,7 +156,7 @@ Allowed:
 
 Any other pair is `422` `INVALID_TRANSITION`. `OPEN → ASSIGNED` also requires an assignee already set; otherwise `422` `ASSIGNMENT_REQUIRED`. Use `/assignment` for the normal first assignment.
 
-`IN_PROGRESS → RESOLVED` is rejected with `400` unless `resolution` is already stored. This step does not add a resolve or close endpoint, so that transition cannot be completed from the client yet. A later status of `CLOSED` sets `closedAt`. Each accepted change records `STATUS_CHANGED`. Pending does not require a comment in this step.
+`IN_PROGRESS → RESOLVED` without a stored resolution is `400`. If a resolution is already stored, the generic route still returns `422` `USE_RESOLVE`. `RESOLVED → CLOSED` on this route is `422` `USE_CLOSE`. Resolve, close, and reopen use their own actions. Each accepted generic change records `STATUS_CHANGED`. Pending does not pause the SLA and does not require a comment.
 
 ## Priority
 
@@ -172,41 +172,41 @@ The deadline is `createdAt + resolutionTimeHours` of the active policy for the n
 
 Same visibility as ticket detail. Results are oldest first. Each item has `action`, `oldValue`, `newValue`, `actor` (`id`, `name`), and `createdAt`. A hidden ticket is `404` `TICKET_NOT_FOUND`.
 
-Creating a ticket records `TICKET_CREATED`. Local MongoDB is a standalone server, so the ticket write and the activity write are sequential, not a multi-document transaction. If the activity insert fails, the service puts the ticket back to its previous values.
+Creating a ticket records `TICKET_CREATED`. A comment records `COMMENT_ADDED` with `newValue` `PUBLIC` or `INTERNAL` and does not copy the message. Students do not receive `COMMENT_ADDED` rows whose value is `INTERNAL`. Local MongoDB is a standalone server, so the ticket write and the activity write are sequential, not a multi-document transaction. If the activity insert fails, the service puts the ticket back to its previous values.
 
 ## Comments
 
-`POST /tickets/:ticketId/comments`
+`POST /tickets/:id/comments`
 
-Body: `message`, `type` (`PUBLIC` or `INTERNAL`), `version`.
-
-Students may post `PUBLIC` only, on their own ticket, and not when `CLOSED`. `INTERNAL` from a student is `403`. If the ticket is `PENDING`, a student `PUBLIC` comment also moves status to `IN_PROGRESS`.
-
-Staff and managers may post either type on a ticket they can read.
-
-`GET /tickets/:ticketId/comments?page&limit` uses the same visibility rules. Default limit 20.
-
-## Resolve, close, reopen, escalate
-
-### POST `/tickets/:ticketId/resolve`
-
-Body: `resolution`, `version`. Assignee or manager. Current status must be `IN_PROGRESS`. Empty resolution: `400`, message "Resolution details are required." Then status `RESOLVED`, `resolvedAt` set, open escalations marked resolved, activity `RESOLVED`.
-
-### POST `/tickets/:ticketId/close`
-
-Body: `version`. Owning student, or manager. Status must be `RESOLVED`. Sets `CLOSED`, `closedAt`, activity `CLOSED`. Staff: `403`.
-
-### POST `/tickets/:ticketId/reopen`
-
-Body: `reason`, `version`. Owning student. Status must be `CLOSED`, reason non-empty, `closedAt` within 7 days.
-
-Intended path:
-
-```text
-CLOSED → REOPENED → IN_PROGRESS
+```json
+{ "message": "Please upload your attendance record.", "type": "PUBLIC" }
 ```
 
-`REOPENED` is an activity action. Whether it is also stored as a ticket status is left for implementation. The frozen end state is `IN_PROGRESS`. The deadline is not extended. `PATCH /status` cannot perform this jump.
+`authorId` is taken from the token. Sending `authorId` is `400`. Message is required, trimmed, and at most 2000 characters. `type` is `PUBLIC` or `INTERNAL`.
+
+A student may add `PUBLIC` comments on their own ticket. `INTERNAL` from a student is `403`. Assigned staff and managers may add either type. Anyone who cannot see the ticket gets `404`. A comment does not change status or the SLA.
+
+`GET /tickets/:id/comments?page=1&limit=20`
+
+Students receive `PUBLIC` comments only, including when the query asks for `INTERNAL`. Staff see both types on assigned tickets. Managers see both types on any ticket. Each comment returns `id`, `message`, `type`, `author` (`id`, `name`), `createdAt`, and `updatedAt`.
+
+## Resolve, close, and reopen
+
+### POST `/tickets/:id/resolve`
+
+Staff on an assigned ticket, or a manager. Students get `403`. Body: `{ "resolution": "Attendance was corrected after verification." }`. Sending `status` or `resolvedAt` is `400`. The ticket must be `IN_PROGRESS`; other statuses are `422` `INVALID_TRANSITION`. Empty resolution is `400`.
+
+The server sets `resolution`, `resolvedAt`, and status `RESOLVED`, then records `STATUS_CHANGED` and `RESOLVED`.
+
+### POST `/tickets/:id/close`
+
+The owning student or a manager. Staff get `403`. Only a `RESOLVED` ticket can be closed. The server sets `closedAt` and status `CLOSED`, then records `STATUS_CHANGED` and `CLOSED`.
+
+### POST `/tickets/:id/reopen`
+
+The owning student or a manager. Staff get `403`. Body: `{ "reason": "The issue is still not resolved." }`. Reason is required, trimmed, and at most 1000 characters. Only a `CLOSED` ticket can be reopened. There is no time limit in this step.
+
+Status becomes `IN_PROGRESS`. `resolution`, `resolvedAt`, and `closedAt` are cleared so the next resolution must be written again. The previous resolution text is kept on the `REOPENED` activity as `oldValue`. The SLA deadline does not move. Earlier activities stay. `PATCH /status` cannot make this jump. Pending still does not pause the SLA.
 
 ### POST `/tickets/:ticketId/escalate`
 

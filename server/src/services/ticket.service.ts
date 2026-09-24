@@ -2,14 +2,15 @@ import type { FilterQuery } from "mongoose";
 import { assertResolutionPresent, assertStatusTransition, deadlineFromPolicy, slaStatusAt } from "../domain/ticketRules.js";
 import { Activity } from "../models/Activity.js";
 import { Category } from "../models/Category.js";
+import { Comment } from "../models/Comment.js";
 import { SLAPolicy } from "../models/SLAPolicy.js";
 import { Ticket } from "../models/Ticket.js";
 import { User, type UserRole } from "../models/User.js";
-import { ticketPriorities, type TicketPriority, type TicketStatus } from "../types/domain.js";
+import { ticketPriorities, type CommentType, type TicketPriority, type TicketStatus } from "../types/domain.js";
 import { AppError } from "../utils/AppError.js";
 import { nextTicketNumber } from "../utils/ticketNumber.js";
 import { toTicketDetail, toTicketSummary, type TicketSource } from "../utils/ticketResponse.js";
-import { recordActivity } from "./activity.service.js";
+import { recordActivities, recordActivity } from "./activity.service.js";
 import type { ActivityListQuery, TicketListQuery } from "../validators/ticket.js";
 
 const ticketPopulate = [
@@ -246,16 +247,14 @@ export async function changeTicketStatus(
   }
   if (nextStatus === "RESOLVED") {
     assertResolutionPresent(ticket.resolution);
+    throw new AppError(422, "USE_RESOLVE", "Resolve a ticket with the resolve action.");
+  }
+  if (nextStatus === "CLOSED") {
+    throw new AppError(422, "USE_CLOSE", "Close a ticket with the close action.");
   }
 
   const previousStatus = ticket.status;
   ticket.status = nextStatus;
-  if (nextStatus === "RESOLVED" && !ticket.resolvedAt) {
-    ticket.resolvedAt = new Date();
-  }
-  if (nextStatus === "CLOSED") {
-    ticket.closedAt = new Date();
-  }
   await ticket.save();
 
   try {
@@ -268,9 +267,6 @@ export async function changeTicketStatus(
     });
   } catch (error) {
     ticket.status = previousStatus;
-    if (nextStatus === "CLOSED") {
-      ticket.closedAt = undefined;
-    }
     await ticket.save();
     throw error;
   }
@@ -335,7 +331,10 @@ export async function listTicketActivities(role: UserRole, userId: string, ticke
     throw new AppError(404, "TICKET_NOT_FOUND", "Ticket not found.");
   }
 
-  const filter = { ticketId };
+  const filter: FilterQuery<unknown> = { ticketId };
+  if (role === "student") {
+    filter.$nor = [{ action: "COMMENT_ADDED", newValue: "INTERNAL" }];
+  }
   const [total, activities] = await Promise.all([
     Activity.countDocuments(filter),
     Activity.find(filter)
@@ -365,4 +364,192 @@ export async function listTicketActivities(role: UserRole, userId: string, ticke
       totalPages: total === 0 ? 0 : Math.ceil(total / query.limit),
     },
   };
+}
+
+async function loadReadableTicket(role: UserRole, userId: string, ticketId: string) {
+  const ticket = await Ticket.findOne(accessFilter(role, userId, ticketId));
+  if (!ticket) {
+    throw new AppError(404, "TICKET_NOT_FOUND", "Ticket not found.");
+  }
+  return ticket;
+}
+
+function commentDto(comment: {
+  _id: { toString(): string };
+  message: string;
+  type: string;
+  createdAt: Date;
+  updatedAt: Date;
+  authorId: { _id?: { toString(): string }; name?: string } | null;
+}) {
+  const author = comment.authorId;
+  return {
+    id: comment._id.toString(),
+    message: comment.message,
+    type: comment.type,
+    author: author && author.name ? { id: author._id?.toString(), name: author.name } : null,
+    createdAt: comment.createdAt,
+    updatedAt: comment.updatedAt,
+  };
+}
+
+export async function addTicketComment(
+  role: UserRole,
+  userId: string,
+  ticketId: string,
+  input: { message: string; type: CommentType },
+) {
+  if (input.type === "INTERNAL" && role === "student") {
+    throw new AppError(403, "FORBIDDEN", "Students cannot add internal notes.");
+  }
+  const ticket = await loadReadableTicket(role, userId, ticketId);
+  const comment = await Comment.create({
+    ticketId: ticket.id,
+    authorId: userId,
+    message: input.message,
+    type: input.type,
+  });
+  try {
+    await recordActivity({
+      ticketId: ticket.id,
+      actorId: userId,
+      action: "COMMENT_ADDED",
+      newValue: input.type,
+    });
+  } catch (error) {
+    await Comment.deleteOne({ _id: comment.id });
+    throw error;
+  }
+  const populated = await Comment.findById(comment.id).populate({ path: "authorId", select: "name" }).lean();
+  if (!populated) {
+    throw new AppError(500, "INTERNAL_ERROR", "Comment was created but could not be loaded.");
+  }
+  return commentDto(populated as Parameters<typeof commentDto>[0]);
+}
+
+export async function listTicketComments(role: UserRole, userId: string, ticketId: string, query: ActivityListQuery) {
+  await loadReadableTicket(role, userId, ticketId);
+  const filter: FilterQuery<unknown> = { ticketId };
+  if (role === "student") {
+    filter.type = "PUBLIC";
+  }
+  const [total, comments] = await Promise.all([
+    Comment.countDocuments(filter),
+    Comment.find(filter)
+      .sort({ createdAt: 1, _id: 1 })
+      .skip((query.page - 1) * query.limit)
+      .limit(query.limit)
+      .populate({ path: "authorId", select: "name" })
+      .lean(),
+  ]);
+  return {
+    comments: comments.map((comment) => commentDto(comment as Parameters<typeof commentDto>[0])),
+    pagination: {
+      page: query.page,
+      limit: query.limit,
+      total,
+      totalPages: total === 0 ? 0 : Math.ceil(total / query.limit),
+    },
+  };
+}
+
+export async function resolveTicket(role: UserRole, userId: string, ticketId: string, resolution: string) {
+  const ticket = await loadWritableTicket(role, userId, ticketId);
+  assertStatusTransition(ticket.status, "RESOLVED");
+  const previousStatus = ticket.status;
+  const previousResolution = ticket.resolution;
+  const previousResolvedAt = ticket.resolvedAt;
+  ticket.status = "RESOLVED";
+  ticket.resolution = resolution;
+  ticket.resolvedAt = new Date();
+  await ticket.save();
+  try {
+    await recordActivities([
+      {
+        ticketId: ticket.id,
+        actorId: userId,
+        action: "STATUS_CHANGED",
+        oldValue: previousStatus,
+        newValue: "RESOLVED",
+      },
+      { ticketId: ticket.id, actorId: userId, action: "RESOLVED", newValue: resolution },
+    ]);
+  } catch (error) {
+    ticket.status = previousStatus;
+    ticket.resolution = previousResolution;
+    ticket.resolvedAt = previousResolvedAt;
+    await ticket.save();
+    throw error;
+  }
+  return reloadTicket(ticket.id);
+}
+
+export async function closeTicket(role: UserRole, userId: string, ticketId: string) {
+  const ticket = await loadReadableTicket(role, userId, ticketId);
+  assertStatusTransition(ticket.status, "CLOSED");
+  const previousStatus = ticket.status;
+  const previousClosedAt = ticket.closedAt;
+  ticket.status = "CLOSED";
+  ticket.closedAt = new Date();
+  await ticket.save();
+  try {
+    await recordActivities([
+      {
+        ticketId: ticket.id,
+        actorId: userId,
+        action: "STATUS_CHANGED",
+        oldValue: previousStatus,
+        newValue: "CLOSED",
+      },
+      { ticketId: ticket.id, actorId: userId, action: "CLOSED", newValue: "CLOSED" },
+    ]);
+  } catch (error) {
+    ticket.status = previousStatus;
+    ticket.closedAt = previousClosedAt;
+    await ticket.save();
+    throw error;
+  }
+  return reloadTicket(ticket.id);
+}
+
+export async function reopenTicket(role: UserRole, userId: string, ticketId: string, reason: string) {
+  const ticket = await loadReadableTicket(role, userId, ticketId);
+  if (ticket.status !== "CLOSED") {
+    throw new AppError(422, "INVALID_TRANSITION", `Cannot change status from ${ticket.status} to IN_PROGRESS.`);
+  }
+  const previousStatus = ticket.status;
+  const previousResolution = ticket.resolution;
+  const previousResolvedAt = ticket.resolvedAt;
+  const previousClosedAt = ticket.closedAt;
+  ticket.status = "IN_PROGRESS";
+  ticket.set("resolution", undefined);
+  ticket.set("resolvedAt", undefined);
+  ticket.set("closedAt", undefined);
+  await ticket.save();
+  try {
+    await recordActivities([
+      {
+        ticketId: ticket.id,
+        actorId: userId,
+        action: "STATUS_CHANGED",
+        oldValue: previousStatus,
+        newValue: "IN_PROGRESS",
+      },
+      {
+        ticketId: ticket.id,
+        actorId: userId,
+        action: "REOPENED",
+        oldValue: previousResolution ?? null,
+        newValue: reason,
+      },
+    ]);
+  } catch (error) {
+    ticket.status = previousStatus;
+    ticket.resolution = previousResolution;
+    ticket.resolvedAt = previousResolvedAt;
+    ticket.closedAt = previousClosedAt;
+    await ticket.save();
+    throw error;
+  }
+  return reloadTicket(ticket.id);
 }
