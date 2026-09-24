@@ -451,11 +451,13 @@ Not built in this prototype:
 
 AI tool: Cursor with Grok.
 
-AI was used for planning, architecture discussion, implementation assistance, test generation and review, documentation, and UI development. Outputs were reviewed against the assignment and the running application. Incorrect assumptions were corrected during implementation, including an early business-hours clock and automatic reassignment on breach. The implemented SLA is wall-clock time, pending does not pause it, and escalation is manual.
+AI was used selectively for implementation assistance, debugging, documentation, validation planning, and repetitive development tasks. The core product requirements, user journeys, ticket lifecycle, SLA model, escalation behavior, permission model, architecture decisions, edge cases, and final product scope were defined and reviewed manually.
 
-Final validation was the server test suite, server and client builds, linting, seed validation, a source-level review of security and authorization, and a live manual browser smoke test. During that smoke test, a closed resolution dialog triggered native validation on a required field. The form now skips native validation while the dialog is closed. The resolution field stays required when the dialog is open, and server-side validation is unchanged. The corrected dialog was not rerun in the browser after the fix.
+During implementation, AI-assisted suggestions were reviewed against the assignment requirements and the running application. Where an approach did not fit the final product or development environment, it was changed. Examples include refining the SLA/escalation behavior, resolving the Vite/Node.js compatibility issue, and aligning documentation with the implemented API and workflows.
 
-The dated log is in `docs/AI_USAGE_REPORT.md`.
+Final validation included the server test suite, server and client builds, linting, database seed validation, authorization and workflow checks, and a live manual browser smoke test. During the smoke test, a closed resolution dialog exposed a native browser validation issue caused by a hidden required field. The dialog was corrected so native validation is skipped while it is closed; the resolution field remains required when open and server-side validation is unchanged. The corrected dialog was not rerun in the browser after the fix.
+
+The detailed dated AI usage log is included in `docs/AI_USAGE_REPORT.md`.
 
 ## 24. Repository and Run Instructions
 
