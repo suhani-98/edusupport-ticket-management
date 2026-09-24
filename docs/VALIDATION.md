@@ -6,7 +6,7 @@ Against `docs/WORKFLOW.md`. Not executed yet.
 |---|---|---|
 | Resolve with an empty resolution | 400, "Resolution details are required", ticket unchanged | Planned |
 | Resolve from OPEN, ASSIGNED, or PENDING | Rejected, status unchanged | Planned |
-| SLA deadline passes while status is IN_PROGRESS | Status stays IN_PROGRESS, slaStatus BREACHED, escalationLevel 1, assigned to the manager | Planned |
+| SLA deadline passes while status is IN_PROGRESS | Status stays unchanged. `PATCH /sla/refresh` sets `BREACHED` and records one `SLA_BREACHED` activity. It does not assign a manager. | Passed in SLA tests (24 Sep 2026). No background job. |
 | SLA deadline passes on RESOLVED or CLOSED | Status and escalated flag stay | Planned |
 | PENDING | Status can move as defined; slaDeadline does not move | Planned |
 | Reassign | Assignee changes; status, createdAt, slaDeadline, and escalation level stay | Passed in workflow tests (24 Sep 2026) |

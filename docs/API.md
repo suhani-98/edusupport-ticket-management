@@ -101,7 +101,9 @@ Missing category: `404` `CATEGORY_NOT_FOUND`. Inactive category: `422` `CATEGORY
 
 ### GET `/tickets`
 
-Query: `page` (default 1), `limit` (default 20, max 100), `status`, `priority`, `categoryId`, `assignedTo`, `slaStatus`, `search`, `sortBy` (`createdAt`, `updatedAt`, `ticketNumber`), `sortOrder` (`asc` or `desc`).
+Query: `page` (default 1), `limit` (default 20, max 100), `status`, `priority`, `categoryId`, `assignedTo`, `slaStatus`, `overdue` (`true` or `false`), `search`, `sortBy` (`createdAt`, `updatedAt`, `ticketNumber`), `sortOrder` (`asc` or `desc`).
+
+`overdue=true` means `slaDeadline` is at or before now and the ticket is not `CLOSED`. `overdue=false` means the deadline is still in the future. Role scope is unchanged.
 
 Example: `GET /api/v1/tickets?page=1&limit=20&status=OPEN&priority=HIGH&slaStatus=BREACHED&search=attendance&sortBy=createdAt&sortOrder=desc`
 
@@ -206,7 +208,40 @@ The owning student or a manager. Staff get `403`. Only a `RESOLVED` ticket can b
 
 The owning student or a manager. Staff get `403`. Body: `{ "reason": "The issue is still not resolved." }`. Reason is required, trimmed, and at most 1000 characters. Only a `CLOSED` ticket can be reopened. There is no time limit in this step.
 
-Status becomes `IN_PROGRESS`. `resolution`, `resolvedAt`, and `closedAt` are cleared so the next resolution must be written again. The previous resolution text is kept on the `REOPENED` activity as `oldValue`. The SLA deadline does not move. Earlier activities stay. `PATCH /status` cannot make this jump. Pending still does not pause the SLA.
+Status becomes `IN_PROGRESS`. `resolution`, `resolvedAt`, and `closedAt` are cleared so the next resolution must be written again. The previous resolution text is kept on the `REOPENED` activity as `oldValue`. The SLA deadline does not move. Earlier activities stay. `PATCH /status` cannot make this jump. Pending still does not pause the SLA. Reopening does not move `slaDeadline`.
+
+## SLA refresh and summary
+
+`PATCH /tickets/:id/sla/refresh` recalculates `slaStatus` from the stored deadline with the existing 25% approaching rule. A manager may refresh any ticket. Assigned staff may refresh their ticket. Students get `403`. A hidden ticket is `404`. The new status is saved only when it changes. Moving to `BREACHED` records one `SLA_BREACHED` activity. A second refresh does not record another. Operational status does not change. Clients cannot send `slaStatus` or `slaDeadline`.
+
+`GET /tickets/sla-summary` is manager-wide or limited to the caller's assigned tickets. Students get `403`. It counts stored values and does not persist a new SLA status.
+
+```json
+{
+  "success": true,
+  "data": {
+    "summary": {
+      "totalOpen": 0,
+      "withinSla": 0,
+      "approachingSla": 0,
+      "breached": 0,
+      "overdueOpen": 0
+    }
+  }
+}
+```
+
+`totalOpen` excludes `CLOSED`. `overdueOpen` is non-closed tickets whose deadline has passed. There is no background SLA job and no notification sender.
+
+## Escalation
+
+`POST /tickets/:id/escalate` with `{ "reason": "Waiting on another office." }`. Assigned staff or a manager. Students get `403`. Empty reason is `400`. Sending `triggeredBy` or assignee fields is `400`.
+
+The first open escalation is `LEVEL_1`. A second open one is `LEVEL_2`. A further open escalation is `409` `ESCALATION_ALREADY_OPEN`. The ticket assignee, status, and SLA deadline stay unchanged. `newAssignee` is null. An `ESCALATED` activity stores the level and reason in metadata, not a comment body.
+
+`GET /tickets/:id/escalations` uses ticket visibility. The response includes level, status, reason, who triggered it (`id`, `name`), and timestamps. It does not include password hashes.
+
+`POST /tickets/:id/escalations/:escalationId/resolve` is for assigned staff or a manager. It sets `RESOLVED` and `resolvedAt`, records `ESCALATION_RESOLVED`, and does not change ticket status or the SLA deadline. Resolving it again is `409` `ESCALATION_NOT_OPEN`.
 
 ### POST `/tickets/:ticketId/escalate`
 

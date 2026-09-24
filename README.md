@@ -85,11 +85,11 @@ Do not commit `.env` files.
 | `npm run dev:client` | Vite dev server |
 | `npm run dev:server` | API with reload |
 | `npm run seed -w server` | Insert local users, categories, and SLA policies |
-| `npm test -w server` | Auth, domain, ticket, workflow, and lifecycle tests |
+| `npm test -w server` | Auth, domain, ticket, workflow, lifecycle, and SLA tests |
 | `npm run build` | Compile the server, then the client |
 | `npm run lint` | ESLint in both packages |
 | `npm run format` | Prettier write |
 
 ## Current status
 
-Authentication, tickets, assignment, status, priority, comments, resolve, close, reopen, and the activity history are in place. Dashboards, automatic escalation, and the ticket UI are not implemented. See `docs/API.md`.
+Authentication, tickets, assignment, status, priority, comments, resolve, close, reopen, explicit SLA refresh, manual escalation, and the activity history are in place. Dashboards, automatic SLA monitoring, notifications, and the ticket UI are not implemented. See `docs/API.md`.

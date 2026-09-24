@@ -103,3 +103,10 @@ Further AI use (implementation, tests, UI) will be appended below as the prototy
 - Students see only public comments. Staff cannot close or reopen. Reopen clears the stored resolution and timestamps, keeps the old resolution on the `REOPENED` activity, and does not move the SLA deadline.
 - Pending still does not pause the SLA.
 - 32 server tests passed. A local public comment, internal comment, resolve, close, reopen, and activity check also passed. The smoke ticket was deleted.
+
+### 24 September 2026 — explicit SLA refresh and manual escalation
+
+- Asked for SLA status evaluation, an explicit refresh endpoint, overdue filtering, an SLA summary, and manual escalation. Dashboards, notifications, and a background SLA job were left out.
+- Refresh persists `slaStatus` only when it changes and records `SLA_BREACHED` once. Escalation does not reassign the ticket. Open escalations stop at level 2.
+- Pending still does not pause the SLA, and reopen does not move the deadline.
+- 34 server tests passed. A local summary, refresh, escalate, list, and resolve check also passed. The smoke ticket was deleted.

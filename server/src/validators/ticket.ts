@@ -3,6 +3,7 @@ import { AppError } from "../utils/AppError.js";
 import {
   COMMENT_MAX_LENGTH,
   DESCRIPTION_MAX_LENGTH,
+  ESCALATION_REASON_MAX_LENGTH,
   REOPEN_REASON_MAX_LENGTH,
   RESOLUTION_MAX_LENGTH,
   SUBJECT_MAX_LENGTH,
@@ -86,6 +87,7 @@ export type TicketListQuery = {
   categoryId?: string;
   assignedTo?: string;
   slaStatus?: SlaStatus;
+  overdue?: boolean;
   search?: string;
   sortBy: "createdAt" | "updatedAt" | "ticketNumber";
   sortOrder: "asc" | "desc";
@@ -132,6 +134,13 @@ export function validateTicketListQuery(query: Record<string, unknown>): TicketL
   if (sortOrder !== "asc" && sortOrder !== "desc") {
     throw new AppError(400, "VALIDATION_ERROR", "sortOrder must be asc or desc.");
   }
+  let overdue: boolean | undefined;
+  if (query.overdue !== undefined && query.overdue !== "") {
+    if (query.overdue !== "true" && query.overdue !== "false") {
+      throw new AppError(400, "VALIDATION_ERROR", "overdue must be true or false.");
+    }
+    overdue = query.overdue === "true";
+  }
   const search = query.search === undefined || query.search === "" ? undefined : String(query.search).trim();
   if (search && search.length > 100) {
     throw new AppError(400, "VALIDATION_ERROR", "search must be at most 100 characters.");
@@ -144,6 +153,7 @@ export function validateTicketListQuery(query: Record<string, unknown>): TicketL
     categoryId: parsedCategoryId,
     assignedTo,
     slaStatus: optionalEnum(query.slaStatus, slaStatuses, "slaStatus"),
+    overdue,
     search: search || undefined,
     sortBy: sortBy as TicketListQuery["sortBy"],
     sortOrder,
@@ -245,4 +255,27 @@ export function validateReopenBody(body: unknown): { reason: string } {
   const record = requireObject(body);
   rejectFields(record, ["status", "resolvedAt", "closedAt", "resolution"]);
   return { reason: requiredText(record.reason, "Reason", REOPEN_REASON_MAX_LENGTH) };
+}
+
+export function validateEscalationBody(body: unknown): { reason: string } {
+  const record = requireObject(body);
+  rejectFields(record, [
+    "triggeredBy",
+    "previousAssignee",
+    "newAssignee",
+    "level",
+    "status",
+    "ticketId",
+    "resolvedAt",
+    "slaDeadline",
+    "slaStatus",
+  ]);
+  return { reason: requiredText(record.reason, "Reason", ESCALATION_REASON_MAX_LENGTH) };
+}
+
+export function validateEscalationId(id: string): string {
+  if (!isObjectId(id) || !Types.ObjectId.isValid(id)) {
+    throw new AppError(400, "VALIDATION_ERROR", "Escalation id is not valid.");
+  }
+  return id;
 }

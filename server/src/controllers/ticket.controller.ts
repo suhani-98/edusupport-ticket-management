@@ -6,12 +6,17 @@ import {
   changeTicketStatus,
   closeTicket,
   createTicketForStudent,
+  escalateTicket,
   getTicketForActor,
   listTicketActivities,
   listTicketComments,
+  listTicketEscalations,
   listTickets,
+  refreshTicketSla,
   reopenTicket,
+  resolveEscalation,
   resolveTicket,
+  summarizeSla,
 } from "../services/ticket.service.js";
 import { AppError } from "../utils/AppError.js";
 import { sendSuccess } from "../utils/apiResponse.js";
@@ -21,6 +26,8 @@ import {
   validateAssignmentBody,
   validateCommentBody,
   validateCreateTicketBody,
+  validateEscalationBody,
+  validateEscalationId,
   validatePriorityBody,
   validateReopenBody,
   validateResolutionBody,
@@ -124,4 +131,40 @@ export const reopenTicketController = asyncHandler(async (req: Request, res: Res
   const current = actor(req);
   const ticket = await reopenTicket(current.role, current.userId, ticketId, input.reason);
   sendSuccess(res, { ticket });
+});
+
+export const refreshSlaController = asyncHandler(async (req: Request, res: Response) => {
+  const ticketId = validateTicketId(String(req.params.id));
+  const current = actor(req);
+  const ticket = await refreshTicketSla(current.role, current.userId, ticketId);
+  sendSuccess(res, { ticket });
+});
+
+export const slaSummaryController = asyncHandler(async (req: Request, res: Response) => {
+  const current = actor(req);
+  const summary = await summarizeSla(current.role, current.userId);
+  sendSuccess(res, { summary });
+});
+
+export const escalateTicketController = asyncHandler(async (req: Request, res: Response) => {
+  const ticketId = validateTicketId(String(req.params.id));
+  const input = validateEscalationBody(req.body);
+  const current = actor(req);
+  const result = await escalateTicket(current.role, current.userId, ticketId, input.reason);
+  sendSuccess(res, result, 201);
+});
+
+export const listEscalationsController = asyncHandler(async (req: Request, res: Response) => {
+  const ticketId = validateTicketId(String(req.params.id));
+  const current = actor(req);
+  const escalations = await listTicketEscalations(current.role, current.userId, ticketId);
+  sendSuccess(res, { escalations });
+});
+
+export const resolveEscalationController = asyncHandler(async (req: Request, res: Response) => {
+  const ticketId = validateTicketId(String(req.params.id));
+  const escalationId = validateEscalationId(String(req.params.escalationId));
+  const current = actor(req);
+  const result = await resolveEscalation(current.role, current.userId, ticketId, escalationId);
+  sendSuccess(res, result);
 });
