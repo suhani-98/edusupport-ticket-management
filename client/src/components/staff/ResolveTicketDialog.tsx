@@ -64,7 +64,7 @@ export function ResolveTicketDialog({
       className={dialogClassName}
       onClose={onClose}
     >
-      <form onSubmit={handleSubmit} className="space-y-4 p-5">
+      <form noValidate={!open} onSubmit={handleSubmit} className="space-y-4 p-5">
         <h2 id={titleId} className="text-lg font-semibold text-slate-900">
           Resolve ticket
         </h2>
