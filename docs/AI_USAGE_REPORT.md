@@ -77,3 +77,9 @@ Further AI use (implementation, tests, UI) will be appended below as the prototy
 - Public registration can only create students. Inactive users and unknown emails share one login error.
 - A manager-only route exists only inside the auth test, not in the running API.
 - 11 authentication tests passed. A live register, login, and `/auth/me` check also passed.
+
+### 24 September 2026 — ticket domain models
+
+- Added Category, SLAPolicy, Ticket, and an atomic ticket-number counter. No ticket HTTP routes.
+- Status changes are limited to the documented transitions. SLA breach stays an SLA status.
+- Seed now upserts the eight categories, four SLA policies, and the three development users.
