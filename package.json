@@ -1,0 +1,28 @@
+{
+  "name": "edusupport",
+  "private": true,
+  "version": "0.1.0",
+  "description": "EduSupport student support and ticket management platform",
+  "workspaces": [
+    "client",
+    "server"
+  ],
+  "scripts": {
+    "dev:client": "npm run dev -w client",
+    "dev:server": "npm run dev -w server",
+    "build": "npm run build -w server && npm run build -w client",
+    "build:client": "npm run build -w client",
+    "build:server": "npm run build -w server",
+    "lint": "npm run lint -w client && npm run lint -w server",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.1",
+    "eslint": "^9.39.1",
+    "eslint-config-prettier": "^10.1.8",
+    "globals": "^16.4.0",
+    "prettier": "^3.6.2",
+    "typescript-eslint": "^8.46.0"
+  }
+}
