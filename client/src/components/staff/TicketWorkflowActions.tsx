@@ -38,7 +38,7 @@ export function TicketWorkflowActions({
         </Button>
       ) : null}
       {canResolve ? (
-        <Button type="button" onClick={onResolve} className="bg-slate-800 hover:bg-slate-900">
+        <Button type="button" variant="secondary" onClick={onResolve}>
           Resolve Ticket
         </Button>
       ) : null}

@@ -95,7 +95,7 @@ export function TicketFilters({ value, onChange, onClear }: TicketFiltersProps) 
       </label>
       <div className="flex items-end gap-2 sm:col-span-2 lg:col-span-3">
         <Button type="submit">Search</Button>
-        <Button type="button" onClick={onClear} className="bg-slate-700 hover:bg-slate-800">
+        <Button type="button" variant="secondary" onClick={onClear} disabled={!value.search && !value.status && !value.priority && !value.slaStatus}>
           Clear filters
         </Button>
       </div>

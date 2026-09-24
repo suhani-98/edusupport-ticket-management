@@ -5,6 +5,8 @@ import { TicketCard } from "../components/tickets/TicketCard";
 import { Alert } from "../components/ui/Alert";
 import { Card } from "../components/ui/Card";
 import { LoadingState } from "../components/ui/LoadingState";
+import { PageHeader } from "../components/ui/PageHeader";
+import { primaryLinkClass } from "../lib/ui";
 import { ApiError } from "../services/api";
 import { getStaffDashboard } from "../services/dashboard.service";
 import type { StaffDashboard } from "../types/ticket";
@@ -46,18 +48,11 @@ export function StaffDashboardPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <h1 className="text-2xl font-semibold text-slate-900">Staff desk</h1>
-          <p className="mt-1 text-sm text-slate-600">Tickets assigned to you, with SLA and escalation counts from the server.</p>
-        </div>
-        <Link
-          to="/staff/tickets"
-          className="inline-flex rounded-md bg-teal-800 px-4 py-2 text-sm font-semibold text-white hover:bg-teal-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-800"
-        >
+      <PageHeader title="Staff desk" description="Tickets assigned to you, with SLA and escalation counts from the server.">
+        <Link to="/staff/tickets" className={primaryLinkClass}>
           Assigned Tickets
         </Link>
-      </div>
+      </PageHeader>
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         <StaffMetricCard label="In progress" value={data.ticketCounts.inProgress} prominent />
         <StaffMetricCard label="Pending" value={data.ticketCounts.pending} prominent />

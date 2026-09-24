@@ -181,7 +181,20 @@ export function StaffTicketFilters({
       </label>
       <div className="flex items-end gap-2">
         <Button type="submit">Search</Button>
-        <Button type="button" onClick={onClear} className="bg-slate-700 hover:bg-slate-800">
+        <Button
+          type="button"
+          variant="secondary"
+          onClick={onClear}
+          disabled={
+            !value.search &&
+            !value.status &&
+            !value.priority &&
+            !value.slaStatus &&
+            !value.categoryId &&
+            !value.assignedTo &&
+            value.overdue === undefined
+          }
+        >
           Clear filters
         </Button>
       </div>

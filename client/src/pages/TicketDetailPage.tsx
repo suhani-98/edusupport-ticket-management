@@ -188,7 +188,7 @@ export function TicketDetailPage() {
                 <Button type="button" loading={closing} onClick={onClose}>
                   Close Ticket
                 </Button>
-                <Button type="button" onClick={() => setConfirmClose(false)} className="bg-slate-700 hover:bg-slate-800">
+                <Button type="button" variant="secondary" onClick={() => setConfirmClose(false)}>
                   Cancel
                 </Button>
               </>

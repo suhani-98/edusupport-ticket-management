@@ -66,6 +66,8 @@ export async function apiRequest<T>(path: string, init: RequestInit = {}): Promi
     if (response.status === 401) {
       clearToken();
       onUnauthorized?.();
+      const sessionMessage = code === "INVALID_CREDENTIALS" ? message : "Your session has expired. Please sign in again.";
+      throw new ApiError(response.status, code, sessionMessage);
     }
     throw new ApiError(response.status, code, message);
   }

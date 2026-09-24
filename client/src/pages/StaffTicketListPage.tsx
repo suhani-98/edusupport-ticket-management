@@ -99,7 +99,7 @@ export function StaffTicketListPage() {
             type="button"
             disabled={result.pagination.page <= 1}
             onClick={() => setFilters((current) => ({ ...current, page: (current.page ?? 1) - 1 }))}
-            className="bg-slate-700 hover:bg-slate-800"
+            variant="secondary"
           >
             Previous
           </Button>
@@ -110,7 +110,7 @@ export function StaffTicketListPage() {
             type="button"
             disabled={result.pagination.page >= result.pagination.totalPages}
             onClick={() => setFilters((current) => ({ ...current, page: (current.page ?? 1) + 1 }))}
-            className="bg-slate-700 hover:bg-slate-800"
+            variant="secondary"
           >
             Next
           </Button>

@@ -1,5 +1,6 @@
 import { useEffect, useId, useRef, useState, type FormEvent } from "react";
 import { REOPEN_REASON_MAX_LENGTH } from "../../types/ticket";
+import { dialogClassName } from "../../lib/ui";
 import { Button } from "../ui/Button";
 import { TextArea } from "../ui/TextArea";
 
@@ -60,7 +61,7 @@ export function ReopenTicketDialog({
     <dialog
       ref={dialogRef}
       aria-labelledby={titleId}
-      className="w-[min(32rem,calc(100%-2rem))] rounded-xl border border-slate-200 p-0 shadow-xl backdrop:bg-slate-900/40"
+      className={dialogClassName}
       onClose={onClose}
     >
       <form onSubmit={handleSubmit} className="space-y-4 p-5">
@@ -80,7 +81,7 @@ export function ReopenTicketDialog({
         />
         {error ? <p className="text-sm text-red-700">{error}</p> : null}
         <div className="flex justify-end gap-2">
-          <Button type="button" onClick={onClose} className="bg-slate-700 hover:bg-slate-800">
+          <Button type="button" variant="secondary" onClick={onClose}>
             Cancel
           </Button>
           <Button type="submit" loading={loading}>

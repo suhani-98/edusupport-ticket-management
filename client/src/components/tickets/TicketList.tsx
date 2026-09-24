@@ -63,7 +63,7 @@ export function TicketList({
           </thead>
           <tbody>
             {tickets.map((ticket) => (
-              <tr key={ticket.id} className="border-b border-slate-100 last:border-0">
+              <tr key={ticket.id} className="border-b border-slate-100 last:border-0 hover:bg-slate-50">
                 <td className="px-4 py-3 font-semibold text-teal-900">
                   <Link to={hrefFor(ticket.id)} className="hover:underline">
                     {ticket.ticketNumber}

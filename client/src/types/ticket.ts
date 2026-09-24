@@ -26,7 +26,7 @@ export const priorityLabels: Record<TicketPriority, string> = {
 export const slaLabels: Record<SlaStatus, string> = {
   WITHIN_SLA: "Within SLA",
   APPROACHING_SLA: "Approaching SLA",
-  BREACHED: "SLA Breached",
+  BREACHED: "Breached",
 };
 
 export const SUBJECT_MAX_LENGTH = 140;

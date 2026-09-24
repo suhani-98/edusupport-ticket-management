@@ -25,7 +25,7 @@ Stack, when implementation starts: React, Node.js, Express, MongoDB, REST, Tailw
 
 `docs/PRD.md`, `docs/WORKFLOW.md`, `docs/DATABASE.md`, and `docs/API.md` are the source of truth. `docs/APPROACH.md` is an older draft and must not be used for SLA or status rules.
 
-Ticket APIs, explicit SLA refresh, manual escalation, activity history, role dashboard APIs, the sign-in shell, and the student, staff, and manager workspaces are implemented. Dashboard charts, notifications, automatic reassignment, real-time updates, and automatic SLA monitoring are not.
+Ticket APIs, explicit SLA refresh, manual escalation, activity history, role dashboard APIs, the sign-in shell, and the student, staff, and manager workspaces are implemented. A product polish pass aligned navigation, badges, dialogs, and empty/loading feedback. Dashboard charts, notifications, automatic reassignment, real-time updates, and automatic SLA monitoring are not.
 
 ## What we will submit
 

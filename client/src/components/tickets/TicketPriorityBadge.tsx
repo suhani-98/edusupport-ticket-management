@@ -4,7 +4,7 @@ const tones: Record<TicketPriority, string> = {
   LOW: "bg-slate-100 text-slate-700",
   MEDIUM: "bg-sky-50 text-sky-900",
   HIGH: "bg-orange-50 text-orange-950",
-  CRITICAL: "bg-red-50 text-red-900",
+  CRITICAL: "bg-red-50 text-red-900 ring-1 ring-red-200",
 };
 
 export function TicketPriorityBadge({ priority }: { priority: TicketPriority }) {

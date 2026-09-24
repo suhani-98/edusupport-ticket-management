@@ -306,7 +306,7 @@ export function StaffTicketDetailPage() {
             <p className="mt-1 text-sm text-slate-700">Resolution deadline: {formatDateTime(ticket.slaDeadline)}</p>
             <p className="mt-2 text-xs text-slate-500">The badge uses the stored SLA status. Refresh asks the server to recompute it.</p>
             <div className="mt-4">
-              <Button type="button" loading={busy} onClick={onRefreshSla} className="bg-slate-800 hover:bg-slate-900">
+              <Button type="button" variant="secondary" loading={busy} onClick={onRefreshSla}>
                 Refresh SLA
               </Button>
             </div>

@@ -145,3 +145,10 @@ Further AI use (implementation, tests, UI) will be appended below as the prototy
 - `POST /tickets` remains student-only, so the manager screen has no create-ticket action.
 - There was no staff directory. `GET /users/staff` was added for managers only. It returns active staff id, name, and email, and never a password hash. Inactive staff, students, and managers are omitted.
 - Assignment sends only `assignedTo`. The API does not support clearing an assignee.
+
+### 25 September 2026 — product polish
+
+- Asked for a visual and interaction pass across the existing student, staff, and manager screens. No new product workflows were added.
+- Shared navigation, buttons, badges, dialogs, metric cards, and page headers were aligned. The unused workspace placeholder was removed.
+- A signed-in request that is no longer authorized now says the session expired. A wrong login password still uses the existing invalid-credentials message.
+- SLA badges use the labels Within SLA, Approaching SLA, and Breached. Browser click-through was not run.

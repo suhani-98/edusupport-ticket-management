@@ -371,7 +371,7 @@ export function ManagerTicketDetailPage() {
             {deadlinePassed ? <p className="mt-2 text-sm font-medium text-red-800">The resolution deadline has passed.</p> : null}
             <p className="mt-2 text-xs text-slate-500">The badge uses the stored SLA status. Refresh asks the server to recompute it.</p>
             <div className="mt-4">
-              <Button type="button" loading={busy} onClick={onRefreshSla} className="bg-slate-800 hover:bg-slate-900">
+              <Button type="button" variant="secondary" loading={busy} onClick={onRefreshSla}>
                 Refresh SLA
               </Button>
             </div>
@@ -407,7 +407,7 @@ export function ManagerTicketDetailPage() {
                   <Button type="button" loading={busy} onClick={onClose}>
                     Confirm close
                   </Button>
-                  <Button type="button" onClick={() => setConfirmClose(false)} className="bg-slate-700 hover:bg-slate-800">
+                  <Button type="button" variant="secondary" onClick={() => setConfirmClose(false)}>
                     Cancel
                   </Button>
                 </div>

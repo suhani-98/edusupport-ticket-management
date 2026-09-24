@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { PageHeader } from "../components/ui/PageHeader";
+import { primaryLinkClass } from "../lib/ui";
 import { CategoryBreakdown } from "../components/manager/CategoryBreakdown";
 import { StaffWorkloadTable } from "../components/manager/StaffWorkloadTable";
 import { StaffMetricCard } from "../components/staff/StaffMetricCard";
@@ -48,18 +50,11 @@ export function ManagerDashboardPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <h1 className="text-2xl font-semibold text-slate-900">Support overview</h1>
-          <p className="mt-1 text-sm text-slate-600">Organization-wide tickets, SLA, and staff workload.</p>
-        </div>
-        <Link
-          to="/manager/tickets"
-          className="inline-flex rounded-md bg-teal-800 px-4 py-2 text-sm font-semibold text-white hover:bg-teal-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-800"
-        >
+      <PageHeader title="Support overview" description="Organization-wide tickets, SLA, and staff workload.">
+        <Link to="/manager/tickets" className={primaryLinkClass}>
           All Tickets
         </Link>
-      </div>
+      </PageHeader>
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <StaffMetricCard label="SLA breached" value={data.slaCounts.breached} prominent />
         <StaffMetricCard label="Overdue open" value={data.slaCounts.overdueOpen} prominent />

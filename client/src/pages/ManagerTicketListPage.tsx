@@ -162,7 +162,7 @@ export function ManagerTicketListPage() {
             type="button"
             disabled={result.pagination.page <= 1}
             onClick={() => setSearchParams(writeFilters({ ...filters, page: result.pagination.page - 1 }))}
-            className="bg-slate-700 hover:bg-slate-800"
+            variant="secondary"
           >
             Previous
           </Button>
@@ -173,7 +173,7 @@ export function ManagerTicketListPage() {
             type="button"
             disabled={result.pagination.page >= result.pagination.totalPages}
             onClick={() => setSearchParams(writeFilters({ ...filters, page: result.pagination.page + 1 }))}
-            className="bg-slate-700 hover:bg-slate-800"
+            variant="secondary"
           >
             Next
           </Button>
