@@ -243,6 +243,26 @@ The first open escalation is `LEVEL_1`. A second open one is `LEVEL_2`. A furthe
 
 `POST /tickets/:id/escalations/:escalationId/resolve` is for assigned staff or a manager. It sets `RESOLVED` and `resolvedAt`, records `ESCALATION_RESOLVED`, and does not change ticket status or the SLA deadline. Resolving it again is `409` `ESCALATION_NOT_OPEN`.
 
+## Dashboards
+
+These are JSON summaries. There are no charts, live updates, or frontend screens.
+
+| Method | Path | Role |
+|---|---|---|
+| GET | `/dashboard/student` | Student |
+| GET | `/dashboard/staff` | Staff |
+| GET | `/dashboard/manager` | Manager |
+
+Any other role gets `403`.
+
+The student response has `ticketCounts` (`total`, `open`, `inProgress`, `pending`, `resolved`, `closed`), `priorityCounts`, `slaCounts` (`withinSla`, `approachingSla`, `breached`), and up to 5 `recentTickets`. Only that student's tickets are counted.
+
+The staff response adds `overdueOpen` and `escalationCounts` (`open`, `level1`, `level2`). `ticketCounts.assigned` is the status `ASSIGNED`. Only tickets assigned to that staff member are included. Open escalations on those tickets are counted. Up to 5 recent tickets.
+
+The manager response is organization-wide and adds `categoryCounts` and `staffWorkload`. Workload lists active staff who have at least one assigned ticket: `assigned` is every ticket assigned to them, plus `inProgress`, `pending`, and `breached`. Recent tickets are limited to 10.
+
+`overdueOpen` is a non-closed ticket whose stored `slaDeadline` is at or before now. Reading a dashboard does not rewrite `slaStatus` and does not write activities. Responses use the ticket summary shape plus `updatedAt`. They do not include `passwordHash` or comment bodies.
+
 ### POST `/tickets/:ticketId/escalate`
 
 Body: `reason`, `version`.

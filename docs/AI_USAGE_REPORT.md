@@ -110,3 +110,10 @@ Further AI use (implementation, tests, UI) will be appended below as the prototy
 - Refresh persists `slaStatus` only when it changes and records `SLA_BREACHED` once. Escalation does not reassign the ticket. Open escalations stop at level 2.
 - Pending still does not pause the SLA, and reopen does not move the deadline.
 - 34 server tests passed. A local summary, refresh, escalate, list, and resolve check also passed. The smoke ticket was deleted.
+
+### 24 September 2026 — role dashboard APIs
+
+- Asked for student, staff, and manager dashboard endpoints only. Charts, notifications, background jobs, and ticket screens were left out.
+- Counts come from the existing ticket and escalation collections. A dashboard read does not rewrite SLA status or write activities.
+- Each role is rejected from the other dashboards. Student counts are own tickets. Staff counts are assigned tickets. Manager counts are organization-wide.
+- 35 server tests passed. A local check of the three dashboards and the role blocks also passed. The smoke tickets were deleted.

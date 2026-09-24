@@ -13,6 +13,9 @@ Against `docs/WORKFLOW.md`. Not executed yet.
 | Two writes with the same version | First succeeds; second returns 409 | Planned |
 | Duplicate open ticket in the same category | Existing numbers returned; confirm still creates | Planned |
 | Student GET of another student's ticket | 404 `TICKET_NOT_FOUND`, same as a missing ticket | Passed in ticket API tests (24 Sep 2026) |
+| Student dashboard | Own tickets only; staff and manager dashboards return 403 | Passed in dashboard tests (24 Sep 2026) |
+| Staff dashboard | Assigned tickets only; other role dashboards return 403 | Passed in dashboard tests (24 Sep 2026) |
+| Manager dashboard | All tickets, category counts, and active staff workload | Passed in dashboard tests (24 Sep 2026) |
 | Staff reassign | 403 | Passed in workflow tests (24 Sep 2026) |
 | Internal note on a student fetch | Omitted from comments and from activity history | Passed in lifecycle tests (24 Sep 2026) |
 | Jump from OPEN to RESOLVED | Rejected | Passed in workflow tests (24 Sep 2026) |
