@@ -64,10 +64,7 @@ async function recentTickets(match: FilterQuery<unknown>, limit: number) {
       { path: "assignedTo", select: "name email" },
     ])
     .lean<TicketSource[]>();
-  return tickets.map((ticket) => ({
-    ...toTicketSummary(ticket),
-    updatedAt: ticket.updatedAt,
-  }));
+  return tickets.map((ticket) => toTicketSummary(ticket));
 }
 
 async function escalationCounts(staffId?: string) {

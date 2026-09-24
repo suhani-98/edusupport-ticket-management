@@ -3,6 +3,10 @@ import { AuthProvider } from "../context/AuthContext";
 import { AppShell } from "../layouts/AppShell";
 import { LoginPage } from "../pages/LoginPage";
 import { RegisterPage } from "../pages/RegisterPage";
+import { CreateTicketPage } from "../pages/CreateTicketPage";
+import { StudentDashboardPage } from "../pages/StudentDashboardPage";
+import { TicketDetailPage } from "../pages/TicketDetailPage";
+import { TicketListPage } from "../pages/TicketListPage";
 import { WorkspacePage } from "../pages/WorkspacePage";
 import { GuestRoute, HomeRedirect, ProtectedRoute, RoleRoute } from "./guards";
 
@@ -19,7 +23,10 @@ export function AppRoutes() {
             <Route element={<AppShell />}>
               <Route path="/" element={<HomeRedirect />} />
               <Route element={<RoleRoute role="student" />}>
-                <Route path="/student" element={<WorkspacePage />} />
+                <Route path="/student" element={<StudentDashboardPage />} />
+                <Route path="/student/tickets" element={<TicketListPage />} />
+                <Route path="/student/tickets/new" element={<CreateTicketPage />} />
+                <Route path="/student/tickets/:id" element={<TicketDetailPage />} />
               </Route>
               <Route element={<RoleRoute role="staff" />}>
                 <Route path="/staff" element={<WorkspacePage />} />

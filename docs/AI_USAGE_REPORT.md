@@ -123,3 +123,11 @@ Further AI use (implementation, tests, UI) will be appended below as the prototy
 - Asked for the client foundation only: API client, auth context, login, student registration, and role placeholders. Ticket screens and dashboard UI were left out.
 - Registration does not return a token, so a new student is sent to sign in. The access token is kept in `localStorage` for this prototype.
 - Role paths are a UI redirect. The API still decides what each role can do.
+
+### 24 September 2026 — student ticket experience
+
+- Asked for the student dashboard, ticket list, create form, detail, public comments, activity timeline, SLA display, and close/reopen. Staff and manager screens were left out.
+- `GET /categories` was already specified for ticket creation and was not implemented. This step adds that read only. Students receive active categories. Managers also receive inactive ones. Category create and update routes are still absent.
+- The list summary now includes `updatedAt`, which the ticket list shows. The client does not calculate SLA status. It shows the stored `slaStatus` and the deadline separately.
+- Students cannot pick comment type. The client always sends `PUBLIC` and never sends `authorId`. Activity rows hide raw ids and internal comment events.
+- Staff UI, manager UI, charts, notifications, and automatic SLA monitoring are not implemented.

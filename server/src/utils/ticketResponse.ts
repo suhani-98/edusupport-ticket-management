@@ -42,6 +42,7 @@ export function toTicketSummary(ticket: TicketSource) {
     slaDeadline: ticket.slaDeadline,
     assignedTo: person(ticket.assignedTo),
     createdAt: ticket.createdAt,
+    updatedAt: ticket.updatedAt,
   };
 }
 
