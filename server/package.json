@@ -8,7 +8,7 @@
     "build": "tsc",
     "start": "node dist/index.js",
     "lint": "eslint .",
-    "test": "tsx --test --test-concurrency=1 src/auth.test.ts src/ticket.domain.test.ts",
+    "test": "tsx --test --test-concurrency=1 src/auth.test.ts src/ticket.domain.test.ts src/ticket.api.test.ts",
     "seed": "tsx src/scripts/seed.ts"
   },
   "dependencies": {

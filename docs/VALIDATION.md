@@ -12,7 +12,7 @@ Against `docs/WORKFLOW.md`. Not executed yet.
 | Reassign | Assignee changes; createdAt, slaDeadline, and escalated stay | Planned |
 | Two writes with the same version | First succeeds; second returns 409 | Planned |
 | Duplicate open ticket in the same category | Existing numbers returned; confirm still creates | Planned |
-| Student GET of another student's ticket | 403 | Planned |
+| Student GET of another student's ticket | 404 `TICKET_NOT_FOUND`, same as a missing ticket | Passed in ticket API tests (24 Sep 2026) |
 | Staff reassign | 403 | Planned |
 | Internal note on a student fetch | Omitted | Planned |
 | Jump from OPEN to RESOLVED | Rejected | Planned |

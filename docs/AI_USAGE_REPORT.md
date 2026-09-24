@@ -83,3 +83,9 @@ Further AI use (implementation, tests, UI) will be appended below as the prototy
 - Added Category, SLAPolicy, Ticket, and an atomic ticket-number counter. No ticket HTTP routes.
 - Status changes are limited to the documented transitions. SLA breach stays an SLA status.
 - Seed now upserts the eight categories, four SLA policies, and the three development users.
+
+### 24 September 2026 — ticket create and read APIs
+
+- Asked for `POST /api/v1/tickets`, `GET /api/v1/tickets`, and `GET /api/v1/tickets/:id` only. Comments, activity history, dashboards, escalation, and ticket screens were left out.
+- Students create tickets. The server sets the owner, ticket number, category default priority, SLA policy, and deadline. A hidden ticket and a missing ticket both return 404.
+- 27 server tests passed (auth, domain, ticket API). A local create, list, and detail check against MongoDB also passed. The smoke ticket was deleted afterward. The counter kept that number, which is the intended gap if an insert is rolled back.

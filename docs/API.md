@@ -61,29 +61,71 @@ Login user example:
 
 ### POST `/tickets`
 
-Student only. Body: `categoryId`, `subject`, `description`. Optional `confirmDuplicate`.
+Student only. The client sends only `categoryId`, `subject`, and `description`.
 
-The server sets ticket number, priority (category `defaultPriority`), SLA policy, deadline, `slaStatus` `WITHIN_SLA`, status `OPEN`, `studentId` from the token, `assignedTo` null, `escalationLevel` 0, and the created activity. A client field `status` or `slaDeadline` is ignored and does not affect the write. If those fields are sent, the validator rejects the request with `400` so the control is obvious.
+```json
+{
+  "categoryId": "665f1c2e9b1a4c0012345678",
+  "subject": "Attendance not updated",
+  "description": "My attendance for Monday is missing."
+}
+```
 
-Duplicate rule from the workflow: same student, same category, status not `RESOLVED` or `CLOSED`. Response `409` `DUPLICATE_WARNING` and the existing ticket numbers. Repeat with `confirmDuplicate: true` to create.
+The server sets the student from the token, `ticketNumber`, priority from the category default, the active SLA policy, `slaDeadline` from `createdAt + resolutionTimeHours`, `slaStatus` (a new ticket is `WITHIN_SLA`), status `OPEN`, and `escalationLevel` 0. Sending `studentId`, `assignedTo`, `status`, `ticketNumber`, `priority`, `slaPolicyId`, `slaDeadline`, `slaStatus`, `escalationLevel`, `resolution`, `resolvedAt`, or `closedAt` returns `400`.
+
+Missing category: `404` `CATEGORY_NOT_FOUND`. Inactive category: `422` `CATEGORY_INACTIVE`. A category with no valid default priority is rejected. Staff or manager: `403`.
+
+```json
+{
+  "success": true,
+  "data": {
+    "ticket": {
+      "id": "...",
+      "ticketNumber": "EDU-1001",
+      "subject": "Attendance not updated",
+      "description": "My attendance for Monday is missing.",
+      "category": { "id": "...", "name": "Attendance" },
+      "priority": "HIGH",
+      "status": "OPEN",
+      "slaStatus": "WITHIN_SLA",
+      "slaDeadline": "2026-09-25T06:00:00.000Z",
+      "assignedTo": null,
+      "student": { "id": "...", "name": "Dev Student", "email": "student@edusupport.local" },
+      "resolution": null,
+      "createdAt": "2026-09-24T22:00:00.000Z",
+      "updatedAt": "2026-09-24T22:00:00.000Z"
+    }
+  }
+}
+```
 
 ### GET `/tickets`
 
-Query: `page` (default 1), `limit` (default 20), `status`, `priority`, `category`, `assignedTo`, `slaStatus`, `search`.
+Query: `page` (default 1), `limit` (default 20, max 100), `status`, `priority`, `categoryId`, `assignedTo`, `slaStatus`, `search`, `sortBy` (`createdAt`, `updatedAt`, `ticketNumber`), `sortOrder` (`asc` or `desc`).
 
-The same route serves every dashboard. The service narrows the query after it knows the caller.
+Example: `GET /api/v1/tickets?page=1&limit=20&status=OPEN&priority=HIGH&slaStatus=BREACHED&search=attendance&sortBy=createdAt&sortOrder=desc`
 
 | Role | Scope |
 |---|---|
-| Student | `studentId` is the caller. `assignedTo` in the query is ignored. |
-| Staff | Tickets assigned to the caller, plus `OPEN` tickets they are allowed to accept. |
+| Student | Only `studentId` equal to the caller. `assignedTo` in the query is ignored. |
+| Staff | Only tickets assigned to the caller. A different `assignedTo` query does not widen that. |
 | Manager | All tickets. `assignedTo` is honored. |
 
-`data` is `{ items, page, limit, total }`.
+`search` matches `subject` and `ticketNumber` with an escaped regular expression. List items omit the description. Response:
 
-### GET `/tickets/:ticketId`
+```json
+{
+  "success": true,
+  "data": {
+    "tickets": [],
+    "pagination": { "page": 1, "limit": 20, "total": 0, "totalPages": 0 }
+  }
+}
+```
 
-Ticket, student, assigned staff, category, SLA deadline and status, comments, and activity. Students do not receive `INTERNAL` comments. Student and not the owner: `403`. Unknown id: `404`.
+### GET `/tickets/:id`
+
+Detail includes description, category, priority, status, SLA, assignee, student name and email, resolution, and timestamps. `passwordHash` is never included. A student or staff member who cannot see the ticket gets `404` `TICKET_NOT_FOUND`, the same response as a missing ticket. An invalid id is `400`. A manager can read any ticket. The body matches the create response above.
 
 ## Assignment
 
